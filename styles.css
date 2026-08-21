@@ -194,6 +194,24 @@ body.team .top {
   line-height: 0;
 }
 
+.back {
+  display: none;
+  justify-self: start;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: -6px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.back svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 .brand img {
   height: 18px;
   width: auto;
@@ -286,11 +304,15 @@ body.team .pill {
 
   body.mission .top,
   body.team .top {
-    padding: 20px var(--edge) 0;
+    padding: 18px 16px 0;
   }
 
-  .brand img {
-    height: 14px;
+  .brand {
+    display: none;
+  }
+
+  .back {
+    display: flex;
   }
 
   .copy {
@@ -301,9 +323,27 @@ body.team .pill {
   }
 
   .roster {
-    flex-wrap: wrap;
-    gap: 1.5rem 2rem;
-    padding-top: 4.5rem;
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+    padding: 4.5rem 10px 1.5rem;
+  }
+
+  .person {
+    flex: 1 1 0;
+    min-width: 0;
+    gap: 0.4rem;
+  }
+
+  .person img {
+    width: 100%;
+    max-width: none;
+  }
+
+  .person figcaption {
+    font-size: 0.62rem;
+    letter-spacing: 0;
+    white-space: normal;
+    line-height: 1.2;
   }
 
   .terrain {
