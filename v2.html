@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="styles.css" />
   <script>document.documentElement.classList.add("is-entering");</script>
 </head>
-<body>
+<body class="v2">
   <div class="page-veil" aria-hidden="true"></div>
   <video
     class="stage"
@@ -37,7 +37,15 @@
   </video>
 
   <header class="top">
-    <span class="top__slot" aria-hidden="true"></span>
+    <a class="back" href="index.html" aria-label="Back to home">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <a class="brand" href="v2.html" aria-label="Gradient MGMT">
+      <img src="assets/logo.svg" alt="" />
+    </a>
+
     <nav class="pill" aria-label="Primary">
       <a class="pill__item" href="mission.html">
         <span class="pill__bubble" aria-hidden="true"></span>
@@ -48,14 +56,18 @@
         <span class="pill__label">Team</span>
       </a>
     </nav>
-    <a class="version" href="v2.html">v.2</a>
+
+    <a class="version" href="index.html">v.1</a>
   </header>
 
-  <main>
-    <h1 class="lockup">
-      <img src="assets/logo.svg" alt="Gradient MGMT" />
-    </h1>
+  <main class="hero-copy">
+    <p class="hero-copy__lead">
+      <span>Gradient partners with owners for the long term —</span>
+      <span>to help you grow, or to give a life’s work a permanent home.</span>
+    </p>
+    <p class="hero-copy__tag">AI-Native Private Equity</p>
   </main>
+
   <script src="transition.js"></script>
 </body>
 </html>
