@@ -225,17 +225,17 @@ html.is-entering .page-veil,
   bottom: 0;
   z-index: 0;
   width: 100%;
-  height: 68vh;
+  height: 22vh;
   pointer-events: none;
   overflow: visible;
-  transform: translateX(-14%) scale(1.48);
+  transform: translateX(-14%) scale(1.82, 1.68);
   transform-origin: center bottom;
 }
 
 .terrain path {
   fill: none;
   stroke: #7c7c7c;
-  stroke-width: 0.85;
+  stroke-width: 3.4;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -306,14 +306,14 @@ body.v2 .pill {
   position: fixed;
   z-index: 1;
   left: var(--edge);
-  bottom: 52px;
-  width: min(34rem, 42vw);
+  top: 5.75rem;
+  width: min(20rem, 26vw);
   color: #fff;
 }
 
 .copy h1 {
-  margin: 0 0 0.75rem;
-  font-size: clamp(1.35rem, 2.1vw, 1.85rem);
+  margin: 0 0 0.55rem;
+  font-size: clamp(1.05rem, 1.35vw, 1.25rem);
   font-weight: 400;
   letter-spacing: -0.03em;
   line-height: 1.05;
@@ -322,14 +322,14 @@ body.v2 .pill {
 .copy__body {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.55rem;
 }
 
 .copy__body p {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.625rem;
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.48;
   letter-spacing: -0.01em;
   color: rgba(255, 255, 255, 0.92);
 }
@@ -402,7 +402,8 @@ body.v2 .pill {
   .copy {
     left: var(--edge);
     right: var(--edge);
-    bottom: 28px;
+    top: 4.25rem;
+    bottom: auto;
     width: auto;
   }
 
@@ -431,7 +432,11 @@ body.v2 .pill {
   }
 
   .terrain {
-    height: 58vh;
+    height: 18vh;
+  }
+
+  .terrain path {
+    stroke-width: 4;
   }
 }
 

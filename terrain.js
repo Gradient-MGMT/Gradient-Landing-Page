@@ -31,14 +31,29 @@ function catmullPath(pts) {
   return d;
 }
 
+function extend(pts) {
+  if (pts.length < 2) return pts;
+  const first = pts[0];
+  const last = pts[pts.length - 1];
+  return [
+    [first[0] - 900, first[1]],
+    [first[0] - 120, first[1]],
+    ...pts,
+    [last[0] + 120, last[1]],
+    [last[0] + 2000, last[1]],
+  ];
+}
+
 function warp(pts, i, t, lineU) {
   return pts.map(([x, y]) => {
-    const xn = x / 2476;
-    const elev = FLOOR - y;
-    const pulse = 1 + 0.08 * Math.sin(t * 0.7 + xn * 2.2 + i * 0.5);
-    const roll = Math.sin(t * 0.5 + xn * 2.6 + i * 0.35) * 14 * (0.2 + lineU);
-    const heave = Math.sin(t * 0.32 + i * 0.4) * 6 * lineU;
-    return [x, FLOOR - elev * pulse + roll + heave];
+    const xn = Math.max(0, Math.min(1, x / 2476));
+    const elev = Math.max(0, FLOOR - y);
+    const relief = Math.pow(elev / FLOOR, 1.12);
+    const leftBias = 1.3 - xn * 0.62;
+    const pulse = 1 + 0.07 * Math.sin(t * 0.7 + xn * 2.2 + i * 0.5);
+    const roll = Math.sin(t * 0.5 + xn * 2.6 + i * 0.35) * 16 * (0.2 + lineU);
+    const heave = Math.sin(t * 0.32 + i * 0.4) * 7 * lineU;
+    return [x, FLOOR - relief * FLOOR * leftBias * pulse + roll + heave];
   });
 }
 
@@ -47,7 +62,7 @@ function boot() {
   if (!svg) return;
 
   const paths = [...svg.querySelectorAll("path")];
-  const rest = paths.map((path) => samplePath(path, SAMPLES));
+  const rest = paths.map((path) => extend(samplePath(path, SAMPLES)));
   const count = paths.length;
 
   paths.forEach((path) => {
@@ -58,6 +73,14 @@ function boot() {
     path.setAttribute("stroke-linejoin", "round");
   });
 
+  const paint = (t) => {
+    for (let i = 0; i < count; i++) {
+      const lineU = i / Math.max(1, count - 1);
+      paths[i].setAttribute("d", catmullPath(warp(rest[i], i, t, lineU)));
+    }
+  };
+
+  paint(0);
   if (reduceMotion) return;
 
   let t = 0;
@@ -67,10 +90,7 @@ function boot() {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     t += dt * SPEED;
-    for (let i = 0; i < count; i++) {
-      const lineU = i / Math.max(1, count - 1);
-      paths[i].setAttribute("d", catmullPath(warp(rest[i], i, t, lineU)));
-    }
+    paint(t);
     requestAnimationFrame(frame);
   }
 
