@@ -19,7 +19,7 @@
   <meta name="twitter:image" content="https://raw.githubusercontent.com/grahamtfarrell/Gradient-Landing-Page/main/assets/share.png" />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=9" />
   <script>document.documentElement.classList.add("is-entering");</script>
 </head>
 <body>
@@ -28,34 +28,24 @@
     class="stage"
     autoplay
     muted
-    loop
     playsinline
+    preload="auto"
     disablepictureinpicture
     aria-hidden="true"
   >
-    <source src="assets/hero.mp4" type="video/mp4" />
+    <source src="assets/hero.mp4?v=8" type="video/mp4" />
   </video>
 
-  <header class="top">
-    <span class="top__slot" aria-hidden="true"></span>
-    <nav class="pill" aria-label="Primary">
-      <a class="pill__item" href="mission.html">
-        <span class="pill__bubble" aria-hidden="true"></span>
-        <span class="pill__label">Mission</span>
-      </a>
-      <a class="pill__item" href="team.html">
-        <span class="pill__bubble" aria-hidden="true"></span>
-        <span class="pill__label">Team</span>
-      </a>
-    </nav>
-    <a class="version" href="v2.html">v.2</a>
-  </header>
-
-  <main>
+  <main class="hero">
     <h1 class="lockup">
       <img src="assets/logo.svg" alt="Gradient MGMT" />
     </h1>
+    <nav class="glass" aria-label="Primary">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
   </main>
+  <script src="hero.js"></script>
   <script src="transition.js"></script>
 </body>
 </html>

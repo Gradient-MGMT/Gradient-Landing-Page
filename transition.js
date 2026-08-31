@@ -25,7 +25,7 @@
     if (!link) return;
 
     const href = link.getAttribute("href");
-    if (!href || href.startsWith("#") || link.target === "_blank" || event.metaKey || event.ctrlKey || event.shiftKey) {
+    if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:") || link.target === "_blank" || event.metaKey || event.ctrlKey || event.shiftKey) {
       return;
     }
 
