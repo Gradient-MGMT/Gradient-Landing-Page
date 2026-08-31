@@ -19,7 +19,7 @@
   <meta name="twitter:image" content="https://raw.githubusercontent.com/grahamtfarrell/Gradient-Landing-Page/main/assets/share.png" />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" />
-  <link rel="stylesheet" href="styles.css?v=9" />
+  <link rel="stylesheet" href="styles.css?v=11" />
   <script>document.documentElement.classList.add("is-entering");</script>
 </head>
 <body>
@@ -33,16 +33,22 @@
     disablepictureinpicture
     aria-hidden="true"
   >
-    <source src="assets/hero.mp4?v=8" type="video/mp4" />
+    <source src="assets/hero.mp4?v=10" type="video/mp4" />
   </video>
 
   <main class="hero">
     <h1 class="lockup">
       <img src="assets/logo.svg" alt="Gradient MGMT" />
     </h1>
-    <nav class="glass" aria-label="Primary">
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
+    <nav class="pill pill--hero" aria-label="Primary">
+      <a class="pill__item" href="about.html">
+        <span class="pill__bubble" aria-hidden="true"></span>
+        <span class="pill__label">About</span>
+      </a>
+      <a class="pill__item" href="contact.html">
+        <span class="pill__bubble" aria-hidden="true"></span>
+        <span class="pill__label">Contact</span>
+      </a>
     </nav>
   </main>
   <script src="hero.js"></script>

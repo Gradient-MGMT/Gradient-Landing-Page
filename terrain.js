@@ -67,8 +67,6 @@ function boot() {
 
   paths.forEach((path) => {
     path.setAttribute("fill", "none");
-    path.setAttribute("stroke", "#7C7C7C");
-    path.setAttribute("stroke-width", "0.85");
     path.setAttribute("stroke-linecap", "round");
     path.setAttribute("stroke-linejoin", "round");
   });
