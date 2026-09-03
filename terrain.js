@@ -36,11 +36,9 @@ function extend(pts) {
   const first = pts[0];
   const last = pts[pts.length - 1];
   return [
-    [first[0] - 900, first[1]],
-    [first[0] - 120, first[1]],
+    [first[0] - 80, first[1]],
     ...pts,
-    [last[0] + 120, last[1]],
-    [last[0] + 2000, last[1]],
+    [last[0] + 80, last[1]],
   ];
 }
 
@@ -62,11 +60,14 @@ function boot() {
   if (!svg) return;
 
   const paths = [...svg.querySelectorAll("path")];
+  if (!paths.length) return;
+
   const rest = paths.map((path) => extend(samplePath(path, SAMPLES)));
   const count = paths.length;
 
   paths.forEach((path) => {
     path.setAttribute("fill", "none");
+    path.setAttribute("stroke", "#fff");
     path.setAttribute("stroke-linecap", "round");
     path.setAttribute("stroke-linejoin", "round");
   });
