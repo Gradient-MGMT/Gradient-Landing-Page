@@ -212,32 +212,19 @@ html.is-entering .page-veil,
 
 body.about,
 body.contact {
-  --page-bg: #000;
-  --page-fg: #fff;
-  --page-muted: rgba(255, 255, 255, 0.72);
-  --line: #7c7c7c;
-  --nav-border: rgba(255, 255, 255, 0.55);
-  --nav-fill: rgba(255, 255, 255, 0.08);
-  --chip: #fff;
-  --chip-fg: #111;
-  background: var(--page-bg);
-  color: var(--page-fg);
-}
-
-html[data-theme="light"] body.about,
-html[data-theme="light"] body.contact {
   --page-bg: #fff;
   --page-fg: #000;
   --page-muted: rgba(0, 0, 0, 0.62);
-  --line: #b0b0b0;
   --nav-border: rgba(0, 0, 0, 0.28);
   --nav-fill: rgba(0, 0, 0, 0.05);
   --chip: #000;
   --chip-fg: #fff;
+  background: var(--page-bg);
+  color: var(--page-fg);
 }
 
-html[data-theme="light"] body.about .page-veil,
-html[data-theme="light"] body.contact .page-veil {
+body.about .page-veil,
+body.contact .page-veil {
   background: #fff;
 }
 
@@ -261,44 +248,13 @@ body.contact .top {
   line-height: 0;
 }
 
-html[data-theme="light"] .brand img {
+body.about .brand img,
+body.contact .brand img {
   filter: invert(1);
 }
 
-.theme {
+.top__right {
   justify-self: end;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  padding: 3px;
-  border: 1px solid var(--nav-border);
-  border-radius: 999px;
-  background: var(--nav-fill);
-}
-
-.theme button {
-  appearance: none;
-  margin: 0;
-  border: 0;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--page-fg);
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.theme button:focus-visible {
-  outline: none;
-}
-
-.theme button[aria-pressed="true"] {
-  background: var(--chip);
-  color: var(--chip-fg);
 }
 
 .back {
@@ -410,11 +366,6 @@ body.contact {
     width: 244px;
     height: 34px;
     gap: 5px;
-  }
-
-  .theme button {
-    padding: 6px 9px;
-    font-size: 10px;
   }
 
   .hero {
