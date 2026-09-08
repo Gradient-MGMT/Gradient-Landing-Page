@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Investor Login — Gradient MGMT</title>
+  <meta name="description" content="Gradient MGMT investor portal access." />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+  <meta name="theme-color" content="#01184D" />
+  <link rel="stylesheet" href="portal.css?v=1" />
+</head>
+<body class="portal-shell portal-login-page">
+  <main class="login-layout">
+    <section class="login-brand" aria-label="Gradient investor portal">
+      <a class="portal-logo portal-logo--light" href="index.html" aria-label="Gradient MGMT home">
+        <img src="assets/brand/logo-white.svg" alt="" />
+      </a>
+      <div class="login-brand__message">
+        <p class="login-brand__kicker">Investor Portal</p>
+        <h1>Clarity at every step.</h1>
+        <p>Portfolio reporting, documents, and account activity in one place.</p>
+      </div>
+      <p class="login-brand__footer">Gradient MGMT</p>
+    </section>
+
+    <section class="login-panel" aria-labelledby="login-title">
+      <div class="login-panel__top">
+        <a class="login-home-link" href="index.html">
+          <span aria-hidden="true">←</span>
+          Return to website
+        </a>
+        <span class="login-access-label">Investor access</span>
+      </div>
+
+      <div class="login-card">
+        <a class="portal-logo portal-logo--dark" href="index.html" aria-label="Gradient MGMT home">
+          <img src="assets/brand/logo-navy.svg" alt="" />
+        </a>
+        <p class="eyebrow">Investor access</p>
+        <h2 id="login-title">Welcome back</h2>
+        <p class="login-intro">Sign in to view your Gradient portfolio.</p>
+
+        <div class="auth-status" id="auth-status" role="status" aria-live="polite"></div>
+
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="email">Email address</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              aria-describedby="email-error"
+            />
+            <span id="email-error" class="field-error"></span>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="password-field">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                aria-describedby="password-error"
+              />
+              <button type="button" class="password-toggle" data-toggle-password aria-label="Show password">Show</button>
+            </div>
+            <span id="password-error" class="field-error"></span>
+          </div>
+
+          <div class="login-options">
+            <label class="check-control">
+              <input name="remember" type="checkbox" />
+              <span>Keep me signed in</span>
+            </label>
+            <button type="button" class="text-button" data-forgot-password>Forgot password?</button>
+          </div>
+
+          <button class="primary-button login-submit" type="submit">
+            <span data-submit-label>Sign in</span>
+            <span class="button-spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <form id="mfa-form" hidden novalidate>
+          <button type="button" class="mfa-back" data-mfa-back>
+            <span aria-hidden="true">←</span>
+            Back to sign in
+          </button>
+          <p class="eyebrow">Verification</p>
+          <h2>Enter your code</h2>
+          <p class="login-intro">Enter the six-digit code from your authenticator.</p>
+          <div class="field mfa-field">
+            <label for="verification-code">Verification code</label>
+            <input
+              id="verification-code"
+              name="code"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="6"
+              pattern="[0-9]{6}"
+              aria-describedby="code-error"
+            />
+            <span id="code-error" class="field-error"></span>
+          </div>
+          <button type="submit" class="primary-button login-submit">Verify code</button>
+        </form>
+
+        <p class="login-support">Need help? <a href="mailto:info@gradientmgmt.com">Contact Gradient</a></p>
+      </div>
+
+      <p class="login-legal">© 2026 Gradient MGMT. All rights reserved.</p>
+    </section>
+  </main>
+
+  <script src="auth-client.js"></script>
+  <script src="portal-login.js"></script>
+</body>
+</html>
