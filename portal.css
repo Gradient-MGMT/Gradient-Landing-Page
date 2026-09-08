@@ -224,14 +224,6 @@
   line-height: 0.91;
 }
 
-.login-brand__message > p:last-child {
-  max-width: 430px;
-  margin: 28px 0 0;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
 .login-brand__footer {
   margin: 0;
   color: rgba(255, 255, 255, 0.55);
@@ -268,11 +260,6 @@
 .login-home-link:hover {
   text-decoration: underline;
   text-underline-offset: 4px;
-}
-
-.login-access-label {
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .portal-logo--dark {
@@ -475,7 +462,6 @@
   }
 
   .login-brand::after,
-  .login-brand__message > p:last-child,
   .login-brand__footer {
     display: none;
   }
@@ -503,10 +489,6 @@
   .login-panel {
     min-height: calc(100vh - 230px);
     padding: 22px 22px 20px;
-  }
-
-  .login-access-label {
-    display: none;
   }
 
   .login-card {
