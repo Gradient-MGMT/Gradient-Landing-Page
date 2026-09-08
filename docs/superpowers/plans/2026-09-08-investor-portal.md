@@ -28,7 +28,6 @@
 ### Task 1: Public Entry Point and Heading Normalization
 
 **Files:**
-- Create: `tests/site-contracts.test.mjs`
 - Modify: `index.html`
 - Modify: `styles.css`
 
@@ -36,38 +35,16 @@
 - Consumes: Existing `.pill`, `.pill__item`, `.copy h1`, and `.contact-sheet h1` selectors.
 - Produces: `portal-login.html` public route and `--section-title-size: 2.5rem` shared CSS token.
 
-- [ ] **Step 1: Write the failing public-site contract tests**
+- [ ] **Step 1: Observe the failing public-site behavior in the browser**
 
-Create `tests/site-contracts.test.mjs` with reusable source helpers and these assertions:
+With the existing site loaded, inspect the rendered home navigation and computed H1 styles.
 
-```js
-import assert from "node:assert/strict";
-import { access, readFile } from "node:fs/promises";
-import test from "node:test";
+Expected RED evidence:
 
-const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
+- Home navigation has two links and no `portal-login.html` destination.
+- About H1 computes below `40px` while Contact H1 computes to `40px`.
 
-test("home navigation exposes the investor login route", async () => {
-  const html = await source("index.html");
-  assert.match(html, /href="portal-login\.html"/);
-  assert.match(html, />Investor Login</);
-});
-
-test("about and contact headings share the approved size token", async () => {
-  const css = await source("styles.css");
-  assert.match(css, /--section-title-size:\s*2\.5rem/);
-  assert.match(css, /\.copy h1\s*\{[^}]*font-size:\s*var\(--section-title-size\)/);
-  assert.match(css, /\.contact-sheet h1\s*\{[^}]*font-size:\s*var\(--section-title-size\)/);
-});
-```
-
-- [ ] **Step 2: Run the tests and verify the new contracts fail**
-
-Run: `node --test tests/site-contracts.test.mjs`
-
-Expected: two failing subtests because the Investor Login link and shared title token do not exist.
-
-- [ ] **Step 3: Add the public navigation item and shared heading token**
+- [ ] **Step 2: Add the public navigation item and shared heading token**
 
 In `index.html`, add this third `.pill__item` after Contact:
 
@@ -96,20 +73,23 @@ In `styles.css`, add the token and consume it in both existing heading rules:
 
 Widen the desktop and mobile pill rules so all three items remain equally legible without changing their height.
 
-- [ ] **Step 4: Run the public-site tests and syntax check**
+- [ ] **Step 3: Verify the rendered public-site behavior**
 
-Run: `node --test tests/site-contracts.test.mjs`
+Reload the home, About, and Contact pages in the browser.
 
-Expected: both subtests pass.
+Expected GREEN evidence:
+
+- Home navigation has three links and the third goes to `portal-login.html`.
+- About and Contact H1 computed font sizes are both `40px`.
 
 Run: `git diff --check`
 
 Expected: exit 0 with no whitespace errors.
 
-- [ ] **Step 5: Commit the public entry point**
+- [ ] **Step 4: Commit the public entry point**
 
 ```bash
-git add index.html styles.css tests/site-contracts.test.mjs
+git add index.html styles.css
 git commit -m "feat: add investor portal entry point"
 ```
 
@@ -121,42 +101,18 @@ git commit -m "feat: add investor portal entry point"
 - Create: `assets/brand/logo-white.svg`
 - Create: `assets/brand/topo-navy.png`
 - Create: `portal.css`
-- Modify: `tests/site-contracts.test.mjs`
 
 **Interfaces:**
 - Consumes: Official assets supplied in the OneDrive Brand Assets folder.
 - Produces: `.portal-shell` design scope, brand CSS variables, self-hosted `Gradient Geist` font family, shared form/control/card styles.
 
-- [ ] **Step 1: Add failing brand-asset and token tests**
+- [ ] **Step 1: Observe missing brand resources through the local server**
 
-Append tests that require the copied assets and exact brand tokens:
+Request `/assets/brand/geist-variable.ttf`, `/assets/brand/logo-navy.svg`, `/assets/brand/logo-white.svg`, `/assets/brand/topo-navy.png`, and `/portal.css`.
 
-```js
-test("portal ships the approved local brand assets", async () => {
-  await Promise.all([
-    "assets/brand/geist-variable.ttf",
-    "assets/brand/logo-navy.svg",
-    "assets/brand/logo-white.svg",
-    "assets/brand/topo-navy.png",
-  ].map((path) => access(new URL(`../${path}`, import.meta.url))));
-});
+Expected RED evidence: every route returns `404` because the portal resources do not exist.
 
-test("portal stylesheet defines the official primary palette", async () => {
-  const css = await source("portal.css");
-  assert.match(css, /--gradient-black:\s*#0d0d0d/i);
-  assert.match(css, /--gradient-eggshell:\s*#f9f9f9/i);
-  assert.match(css, /--gradient-navy:\s*#01184d/i);
-  assert.match(css, /@font-face[\s\S]*geist-variable\.ttf/);
-});
-```
-
-- [ ] **Step 2: Run the focused tests and verify failure**
-
-Run: `node --test --test-name-pattern="portal ships|portal stylesheet" tests/site-contracts.test.mjs`
-
-Expected: failure because `assets/brand/` and `portal.css` do not exist.
-
-- [ ] **Step 3: Copy the approved assets into the repository**
+- [ ] **Step 2: Copy the approved assets into the repository**
 
 Copy these exact sources:
 
@@ -167,7 +123,7 @@ Brand Assets/Logo/svg/logo_white.svg -> assets/brand/logo-white.svg
 Brand Assets/Misc/Topographical Lines/navy_topo_map.png -> assets/brand/topo-navy.png
 ```
 
-- [ ] **Step 4: Create the portal CSS foundation**
+- [ ] **Step 3: Create the portal CSS foundation**
 
 Start `portal.css` with the exact design tokens and namespaced reset:
 
@@ -201,16 +157,16 @@ Start `portal.css` with the exact design tokens and namespaced reset:
 
 Add namespaced foundations for buttons, inputs, cards, status text, `:focus-visible`, and reduced motion. Do not style unscoped public-site elements.
 
-- [ ] **Step 5: Run the brand tests**
+- [ ] **Step 4: Verify brand resources through the local server**
 
-Run: `node --test --test-name-pattern="portal ships|portal stylesheet" tests/site-contracts.test.mjs`
+Request the five routes from Step 1 again.
 
-Expected: two passing subtests.
+Expected GREEN evidence: every route returns `200`, the logos use SVG content types, the font uses a font/TTF content type, and the topographic image uses a PNG content type.
 
-- [ ] **Step 6: Commit the portal foundation**
+- [ ] **Step 5: Commit the portal foundation**
 
 ```bash
-git add assets/brand portal.css tests/site-contracts.test.mjs
+git add assets/brand portal.css
 git commit -m "feat: add portal brand foundation"
 ```
 
@@ -339,44 +295,18 @@ git commit -m "feat: add mock authentication adapter"
 - Create: `portal-login.html`
 - Create: `portal-login.js`
 - Modify: `portal.css`
-- Modify: `tests/site-contracts.test.mjs`
 
 **Interfaces:**
 - Consumes: `window.GradientAuth`, `.portal-shell` tokens, `assets/brand/logo-navy.svg`, and `assets/brand/topo-navy.png`.
 - Produces: `#login-form`, `#mfa-form`, `#auth-status`, field error elements, and redirect to `portal.html` after `authenticated`.
 
-- [ ] **Step 1: Add failing sign-in document tests**
+- [ ] **Step 1: Observe the missing login route**
 
-Append these contracts:
+Request `/portal-login.html` from the local server.
 
-```js
-test("login page exposes labeled credential and MFA forms", async () => {
-  const html = await source("portal-login.html");
-  assert.match(html, /id="login-form"/);
-  assert.match(html, /<label[^>]*for="email"/);
-  assert.match(html, /<label[^>]*for="password"/);
-  assert.match(html, /id="auth-status"[^>]*aria-live="polite"/);
-  assert.match(html, /id="mfa-form"/);
-  assert.match(html, /autocomplete="one-time-code"/);
-  assert.match(html, /src="auth-client\.js"/);
-  assert.match(html, /src="portal-login\.js"/);
-});
+Expected RED evidence: the route returns `404` because the sign-in experience does not exist.
 
-test("login controller uses only the auth client boundary", async () => {
-  const js = await source("portal-login.js");
-  assert.match(js, /GradientAuth\.signIn/);
-  assert.match(js, /GradientAuth\.verifyChallenge/);
-  assert.doesNotMatch(js, /localStorage|sessionStorage|fetch\(/);
-});
-```
-
-- [ ] **Step 2: Run the focused tests and verify failure**
-
-Run: `node --test --test-name-pattern="login page|login controller" tests/site-contracts.test.mjs`
-
-Expected: failure because the login files do not exist.
-
-- [ ] **Step 3: Build semantic sign-in markup**
+- [ ] **Step 2: Build semantic sign-in markup**
 
 Create `portal-login.html` with this document structure:
 
@@ -433,24 +363,33 @@ Create `portal-login.html` with this document structure:
 
 Fill the credential form with persistent labels, `autocomplete="email"`, `autocomplete="current-password"`, show-password button, remember-me checkbox, field error elements, forgot-password button, and submit button. Fill the hidden MFA form with a six-digit code input, back button, and verify button.
 
-- [ ] **Step 4: Implement local form behavior through the adapter**
+- [ ] **Step 3: Implement local form behavior through the adapter**
 
 In `portal-login.js`, bind the form events, map `result.fields` to `aria-invalid` plus error text, clear the password input immediately after `signIn` resolves, reveal `#mfa-form` only for `mfa_required`, and navigate with `window.location.assign("portal.html")` for `authenticated`. Implement local show-password and forgot-password status states; never access web storage or make a network request.
 
-- [ ] **Step 5: Add responsive sign-in styles**
+- [ ] **Step 4: Add responsive sign-in styles**
 
 Extend `portal.css` with a two-column desktop layout, Navy artwork panel, Eggshell form panel, clear focus/validation states, and a single-column layout under `760px`. Use the official topographic file as a low-opacity decorative layer and hide nonessential artwork under reduced motion/small screens.
 
-- [ ] **Step 6: Run login and auth tests**
+- [ ] **Step 5: Verify the sign-in behavior in the browser**
 
-Run: `node --test tests/site-contracts.test.mjs tests/auth-client.test.mjs`
+Expected GREEN evidence:
 
-Expected: all current subtests pass.
+- `/portal-login.html` returns `200` and displays labeled Email and Password fields.
+- Empty submission produces field errors and sets `aria-invalid="true"`.
+- Show password toggles the input type and accessible label.
+- Forgot password announces a support message without leaving the page.
+- Valid submission clears the password field and navigates to the dashboard route.
+- The browser console has no errors or warnings.
 
-- [ ] **Step 7: Commit the sign-in experience**
+Run: `node --test tests/auth-client.test.mjs`
+
+Expected: all auth-client subtests pass.
+
+- [ ] **Step 6: Commit the sign-in experience**
 
 ```bash
-git add portal-login.html portal-login.js portal.css tests/site-contracts.test.mjs
+git add portal-login.html portal-login.js portal.css
 git commit -m "feat: build investor sign-in experience"
 ```
 
@@ -458,47 +397,79 @@ git commit -m "feat: build investor sign-in experience"
 
 **Files:**
 - Create: `portal.html`
+- Create: `portal-state.js`
 - Create: `portal.js`
+- Create: `tests/portal-state.test.mjs`
 - Modify: `portal.css`
-- Modify: `tests/site-contracts.test.mjs`
 
 **Interfaces:**
-- Consumes: `window.GradientAuth.getSession()` and `signOut()`, portal design tokens, brand assets.
-- Produces: `[data-portal-nav]`, `[data-panel]`, `[data-document-filter]`, `[data-document-row]`, `[data-profile-menu]`, `[data-sign-out]`, and local status announcements.
+- Consumes: `window.GradientAuth.getSession()` and `signOut()`, `window.GradientPortalState`, portal design tokens, and brand assets.
+- Produces: `normalizePanel(name)`, `filterDocuments(filter, documents)`, `[data-portal-nav]`, `[data-panel]`, `[data-document-filter]`, `[data-document-row]`, `[data-profile-menu]`, `[data-sign-out]`, and local status announcements.
 
-- [ ] **Step 1: Add failing dashboard contract tests**
+- [ ] **Step 1: Write failing portal-state tests**
 
-Append:
+Create `tests/portal-state.test.mjs`:
 
 ```js
-test("dashboard exposes required landmarks and fictional data surfaces", async () => {
-  const html = await source("portal.html");
-  assert.match(html, /<aside[^>]*aria-label="Portal navigation"/);
-  assert.match(html, /<main[^>]*id="portal-main"/);
-  assert.match(html, /data-panel="overview"/);
-  assert.match(html, /data-panel="investments"/);
-  assert.match(html, /data-panel="documents"/);
-  assert.match(html, /data-panel="account"/);
-  assert.match(html, /<table[\s\S]*<caption/);
-  assert.match(html, /data-sign-out/);
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+import vm from "node:vm";
+
+async function loadState() {
+  const window = {};
+  const code = await readFile(new URL("../portal-state.js", import.meta.url), "utf8");
+  vm.runInNewContext(code, { window });
+  return window.GradientPortalState;
+}
+
+test("unknown dashboard destinations resolve to overview", async () => {
+  const state = await loadState();
+  assert.equal(state.normalizePanel("documents"), "documents");
+  assert.equal(state.normalizePanel("unknown"), "overview");
 });
 
-test("dashboard controller guards access and uses the auth boundary", async () => {
-  const js = await source("portal.js");
-  assert.match(js, /GradientAuth\.getSession/);
-  assert.match(js, /GradientAuth\.signOut/);
-  assert.match(js, /portal-login\.html/);
-  assert.doesNotMatch(js, /localStorage|sessionStorage|fetch\(/);
+test("document filters return only matching records", async () => {
+  const state = await loadState();
+  const documents = [
+    { id: "report", type: "reports" },
+    { id: "tax", type: "tax" },
+  ];
+  assert.deepEqual(state.filterDocuments("tax", documents), [{ id: "tax", type: "tax" }]);
+  assert.deepEqual(state.filterDocuments("all", documents), documents);
+  assert.deepEqual(state.filterDocuments("notices", documents), []);
 });
 ```
 
-- [ ] **Step 2: Run focused tests and verify failure**
+- [ ] **Step 2: Run portal-state tests and observe the missing route**
 
-Run: `node --test --test-name-pattern="dashboard exposes|dashboard controller" tests/site-contracts.test.mjs`
+Run: `node --test tests/portal-state.test.mjs`
 
-Expected: failure because the dashboard files do not exist.
+Expected RED evidence: the tests fail because `portal-state.js` does not exist.
 
-- [ ] **Step 3: Build the dashboard document**
+Request `/portal.html` from the local server.
+
+Expected RED evidence: the route returns `404`.
+
+- [ ] **Step 3: Implement the tested portal-state boundary**
+
+```js
+(() => {
+  const panels = new Set(["overview", "investments", "documents", "account"]);
+  const normalizePanel = (name) => panels.has(name) ? name : "overview";
+  const filterDocuments = (filter, documents) => filter === "all"
+    ? [...documents]
+    : documents.filter((document) => document.type === filter);
+
+  window.GradientPortalState = Object.freeze({ normalizePanel, filterDocuments });
+})();
+```
+
+Run: `node --test tests/portal-state.test.mjs`
+
+Expected GREEN evidence: both subtests pass.
+
+- [ ] **Step 4: Build the dashboard document**
 
 Create `portal.html` with:
 
@@ -554,6 +525,7 @@ Create `portal.html` with:
   </div>
   <div class="portal-toast" role="status" aria-live="polite"></div>
   <script src="auth-client.js"></script>
+  <script src="portal-state.js"></script>
   <script src="portal.js"></script>
 </body>
 ```
@@ -571,7 +543,7 @@ Populate the panels with fictional, internally consistent content:
 
 Include an SVG allocation chart with a text legend, semantic table caption/headers, filter buttons, profile menu, security/MFA-ready card, and mobile menu button.
 
-- [ ] **Step 4: Implement dashboard behavior**
+- [ ] **Step 5: Implement dashboard behavior**
 
 In `portal.js`:
 
@@ -584,22 +556,24 @@ if (!auth.getSession().authenticated) {
 }
 ```
 
-`bootPortal()` will switch visible panels, synchronize `aria-current`, filter document rows, show/reset the empty state, toggle the profile and mobile menus, announce unavailable preview documents in the toast region, show an MFA informational state, and call `auth.signOut()` before returning to login. Escape closes open menus and focus returns to the triggering control.
+`bootPortal()` will use `GradientPortalState.normalizePanel()` when switching visible panels and synchronizing `aria-current`. It will use `GradientPortalState.filterDocuments()` to filter document records, show/reset the empty state, toggle the profile and mobile menus, announce unavailable preview documents in the toast region, show an MFA informational state, and call `auth.signOut()` before returning to login. Escape closes open menus and focus returns to the triggering control.
 
-- [ ] **Step 5: Complete dashboard styling**
+- [ ] **Step 6: Complete dashboard styling**
 
 Extend `portal.css` with a Navy sidebar, Eggshell workspace, responsive metric grid, allocation chart, investment/document tables, activity timeline, account cards, mobile bottom/overlay navigation, and visible hover/focus/selected states. At `max-width: 920px`, reduce the metric grid; at `max-width: 700px`, stack cards and turn dense table rows into labeled blocks without removing information.
 
-- [ ] **Step 6: Run the complete automated suite**
+- [ ] **Step 7: Run the complete automated suite and browser flow**
 
 Run: `node --test tests/*.test.mjs`
 
 Expected: all subtests pass with zero failures.
 
-- [ ] **Step 7: Commit the dashboard**
+Expected browser evidence: `/portal.html` returns `200`; authenticated navigation, filters, menus, unavailable-document state, MFA information, and sign-out work without console errors.
+
+- [ ] **Step 8: Commit the dashboard**
 
 ```bash
-git add portal.html portal.js portal.css tests/site-contracts.test.mjs
+git add portal.html portal-state.js portal.js portal.css tests/portal-state.test.mjs
 git commit -m "feat: add mock investor dashboard"
 ```
 
