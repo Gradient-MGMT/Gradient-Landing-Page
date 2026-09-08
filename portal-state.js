@@ -11,8 +11,13 @@
       : documents.filter((document) => document.type === filter);
   }
 
+  function shouldDisableSidebar({ isMobile, isOpen }) {
+    return isMobile && !isOpen;
+  }
+
   window.GradientPortalState = Object.freeze({
     normalizePanel,
     filterDocuments,
+    shouldDisableSidebar,
   });
 })();

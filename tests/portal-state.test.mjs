@@ -31,3 +31,11 @@ test("document filters return only matching records", async () => {
   assert.deepEqual(Array.from(state.filterDocuments("all", documents)), documents);
   assert.deepEqual(Array.from(state.filterDocuments("notices", documents)), []);
 });
+
+test("a closed mobile sidebar is removed from keyboard navigation", async () => {
+  const state = await loadState();
+
+  assert.equal(state.shouldDisableSidebar({ isMobile: true, isOpen: false }), true);
+  assert.equal(state.shouldDisableSidebar({ isMobile: true, isOpen: true }), false);
+  assert.equal(state.shouldDisableSidebar({ isMobile: false, isOpen: false }), false);
+});
