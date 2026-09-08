@@ -48,3 +48,14 @@ test("the public-page logo scales to the active navigation highlight", async () 
     /\.brand img\s*{[^}]*height:\s*clamp\(18px, calc\(6\.93vw - 35\.21px\), 41px\);/s,
   );
 });
+
+test("the mobile terrain follows the page copy instead of covering it", async () => {
+  const styles = await projectFile("styles.css");
+  const mobileStyles = styles.match(/@media \(max-width: 720px\)\s*{([\s\S]*?)\n}\n\n@media \(prefers-reduced-motion/);
+
+  assert.ok(mobileStyles, "expected the public-page mobile breakpoint");
+  assert.match(mobileStyles[1], /body\.about,\s*body\.contact\s*{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;[^}]*height:\s*auto;/s);
+  assert.match(mobileStyles[1], /body\.about \.top,\s*body\.contact \.top\s*{[^}]*order:\s*1;/s);
+  assert.match(mobileStyles[1], /\.page-copy\s*{[^}]*order:\s*2;[^}]*margin:\s*1\.75rem auto 3rem;/s);
+  assert.match(mobileStyles[1], /\.terrain\s*{[^}]*position:\s*relative;[^}]*order:\s*3;[^}]*height:\s*30vh;[^}]*transform:\s*translateX\(-14%\) scale\(1\.82, 1\);/s);
+});

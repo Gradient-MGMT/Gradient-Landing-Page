@@ -362,6 +362,7 @@ body.contact .pill {
 
   body.about .top,
   body.contact .top {
+    order: 1;
     padding: 18px 16px 0;
   }
 
@@ -375,16 +376,28 @@ body.contact .pill {
 
   body.about,
   body.contact {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
     overflow-y: auto;
   }
 
   .page-copy {
+    order: 2;
     width: calc(100vw - var(--edge) - var(--edge));
-    margin: 1.75rem auto 9rem;
+    margin: 1.75rem auto 3rem;
   }
 
   .terrain {
-    height: 18vh;
+    position: relative;
+    inset: auto;
+    order: 3;
+    flex: 0 0 30vh;
+    height: 30vh;
+    margin-top: auto;
+    transform: translateX(-14%) scale(1.82, 1);
   }
 
   .terrain path {
