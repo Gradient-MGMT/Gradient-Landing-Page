@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio Overview — Gradient MGMT</title>
+  <meta name="description" content="Gradient MGMT investor portfolio overview." />
+  <meta name="theme-color" content="#01184D" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+  <link rel="stylesheet" href="portal.css?v=1" />
+</head>
+<body class="portal-shell portal-app">
+  <div class="portal-frame">
+    <aside class="portal-sidebar" aria-label="Portal navigation">
+      <div>
+        <a class="portal-logo portal-sidebar__logo" href="index.html" aria-label="Gradient MGMT home">
+          <img src="assets/brand/logo-white.svg" alt="" />
+        </a>
+
+        <div class="fund-context">
+          <span class="fund-context__label">Current fund</span>
+          <strong>Gradient Growth Fund I</strong>
+          <span>Vintage 2024</span>
+        </div>
+
+        <nav class="portal-nav">
+          <button class="portal-nav__item" type="button" data-portal-nav="overview" aria-current="page">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z" /></svg>
+            <span>Overview</span>
+          </button>
+          <button class="portal-nav__item" type="button" data-portal-nav="investments">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10m7 10V4m7 16v-7M3 20h18" /></svg>
+            <span>Investments</span>
+          </button>
+          <button class="portal-nav__item" type="button" data-portal-nav="documents">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6V3Zm8 0v5h4M9 13h6M9 17h6" /></svg>
+            <span>Documents</span>
+            <span class="portal-nav__count">4</span>
+          </button>
+          <button class="portal-nav__item" type="button" data-portal-nav="account">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4.5 21a7.5 7.5 0 0 1 15 0" /></svg>
+            <span>Account</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="portal-sidebar__footer">
+        <span>Client service</span>
+        <a href="mailto:info@gradientmgmt.com">info@gradientmgmt.com</a>
+        <a class="portal-sidebar__site-link" href="index.html">Return to Gradient MGMT <span aria-hidden="true">↗</span></a>
+      </div>
+    </aside>
+
+    <div class="mobile-nav-scrim" data-mobile-scrim hidden></div>
+
+    <div class="portal-workspace">
+      <header class="portal-header">
+        <button class="mobile-menu-button" type="button" data-mobile-menu aria-label="Open navigation" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        </button>
+        <div class="portal-header__context">
+          <span>Investor Portal</span>
+          <strong data-header-title>Portfolio overview</strong>
+        </div>
+        <div class="profile-control">
+          <button class="profile-button" type="button" data-profile-toggle aria-expanded="false">
+            <span class="profile-avatar" aria-hidden="true">JL</span>
+            <span class="profile-button__copy"><strong>Jordan Lee</strong><small>Investor</small></span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4" /></svg>
+          </button>
+          <div class="profile-menu" data-profile-menu hidden>
+            <div class="profile-menu__identity">
+              <strong>Jordan Lee</strong>
+              <span>jordan.lee@example.com</span>
+            </div>
+            <button type="button" data-portal-nav="account">Account settings</button>
+            <button type="button" data-sign-out>Sign out</button>
+          </div>
+        </div>
+      </header>
+
+      <main id="portal-main" class="portal-main" tabindex="-1">
+        <section class="portal-panel" data-panel="overview">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Portfolio overview</p>
+              <h1>Good afternoon, Jordan.</h1>
+              <p>Here is the latest activity across your Gradient portfolio.</p>
+            </div>
+            <div class="as-of-date"><span>Reporting period</span><strong>Q2 2026</strong><small>As of June 30, 2026</small></div>
+          </div>
+
+          <div class="metric-grid" aria-label="Portfolio summary">
+            <article class="metric-card portal-card">
+              <span>Committed capital</span>
+              <strong>$5.00M</strong>
+              <small>Fund commitment</small>
+            </article>
+            <article class="metric-card portal-card">
+              <span>Invested capital</span>
+              <strong>$3.85M</strong>
+              <small>77% of commitment</small>
+            </article>
+            <article class="metric-card metric-card--accent portal-card">
+              <span>Current value</span>
+              <strong>$4.62M</strong>
+              <small><span class="positive">↑ 20.0%</span> on invested capital</small>
+            </article>
+            <article class="metric-card portal-card">
+              <span>Total distributions</span>
+              <strong>$640K</strong>
+              <small>Since inception</small>
+            </article>
+          </div>
+
+          <div class="overview-grid">
+            <article class="allocation-card portal-card">
+              <div class="card-heading">
+                <div><span>Current portfolio</span><h2>Allocation by value</h2></div>
+                <span class="card-b-meta">$4.62M total</span>
+              </div>
+              <div class="allocation-layout">
+                <figure class="allocation-chart">
+                  <svg viewBox="0 0 180 180" role="img" aria-labelledby="allocation-title allocation-desc">
+                    <title id="allocation-title">Portfolio allocation</title>
+                    <desc id="allocation-desc">Northstar Industrial 32.9%, Atlas Field Services 26.8%, Meridian Compliance 23.4%, and Harbor Systems 16.9%.</desc>
+                    <circle class="donut-track" cx="90" cy="90" r="64" />
+                    <circle class="donut-segment donut-segment--one" cx="90" cy="90" r="64" pathLength="100" />
+                    <circle class="donut-segment donut-segment--two" cx="90" cy="90" r="64" pathLength="100" />
+                    <circle class="donut-segment donut-segment--three" cx="90" cy="90" r="64" pathLength="100" />
+                    <circle class="donut-segment donut-segment--four" cx="90" cy="90" r="64" pathLength="100" />
+                  </svg>
+                  <figcaption><strong>4</strong><span>companies</span></figcaption>
+                </figure>
+                <ul class="allocation-legend">
+                  <li><span class="legend-dot legend-dot--one"></span><div><strong>Northstar Industrial</strong><span>32.9%</span></div></li>
+                  <li><span class="legend-dot legend-dot--two"></span><div><strong>Atlas Field Services</strong><span>26.8%</span></div></li>
+                  <li><span class="legend-dot legend-dot--three"></span><div><strong>Meridian Compliance</strong><span>23.4%</span></div></li>
+                  <li><span class="legend-dot legend-dot--four"></span><div><strong>Harbor Systems</strong><span>16.9%</span></div></li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="performance-card portal-card">
+              <div class="card-heading"><div><span>Since inception</span><h2>Fund performance</h2></div></div>
+              <dl class="performance-stats">
+                <div><dt>Net multiple</dt><dd>1.37×</dd></div>
+                <div><dt>Net IRR</dt><dd>18.4%</dd></div>
+              </dl>
+              <div class="capital-progress">
+                <div><span>Capital invested</span><strong>77%</strong></div>
+                <div class="progress-track" role="img" aria-label="77 percent of committed capital invested"><span></span></div>
+              </div>
+              <p>Performance includes invested capital, current value, and distributions through the reporting date.</p>
+            </article>
+
+            <article class="activity-card portal-card">
+              <div class="card-heading"><div><span>Recent updates</span><h2>Activity</h2></div><button type="button" class="card-link" data-portal-nav="documents">Documents</button></div>
+              <ol class="activity-list">
+                <li><span class="activity-icon activity-icon--distribution" aria-hidden="true">↓</span><div><strong>Distribution received</strong><span>Northstar Industrial</span></div><div><strong>+$180K</strong><time datetime="2026-07-14">Jul 14</time></div></li>
+                <li><span class="activity-icon" aria-hidden="true">↗</span><div><strong>Quarterly valuation posted</strong><span>Gradient Growth Fund I</span></div><div><strong>$4.62M</strong><time datetime="2026-06-30">Jun 30</time></div></li>
+                <li><span class="activity-icon activity-icon--call" aria-hidden="true">↑</span><div><strong>Capital call funded</strong><span>Harbor Systems add-on</span></div><div><strong>−$275K</strong><time datetime="2026-05-20">May 20</time></div></li>
+              </ol>
+            </article>
+          </div>
+
+          <article class="holdings-preview portal-card">
+            <div class="card-heading"><div><span>Holdings</span><h2>Portfolio companies</h2></div><button type="button" class="card-link" data-portal-nav="investments">View all investments</button></div>
+            <div class="company-strip">
+              <div><span class="company-mark company-mark--one">NI</span><p><strong>Northstar Industrial</strong><span>Industrial technology</span></p><strong>$1.52M</strong></div>
+              <div><span class="company-mark company-mark--two">AF</span><p><strong>Atlas Field Services</strong><span>Infrastructure services</span></p><strong>$1.24M</strong></div>
+              <div><span class="company-mark company-mark--three">MC</span><p><strong>Meridian Compliance</strong><span>Business services</span></p><strong>$1.08M</strong></div>
+              <div><span class="company-mark company-mark--four">HS</span><p><strong>Harbor Systems</strong><span>Vertical software</span></p><strong>$780K</strong></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="portal-panel" data-panel="investments" hidden>
+          <div class="panel-heading panel-heading--compact">
+            <div><p class="eyebrow">Portfolio</p><h1>Investments</h1><p>Current holdings in Gradient Growth Fund I.</p></div>
+            <div class="as-of-date"><span>Total current value</span><strong>$4.62M</strong><small>As of June 30, 2026</small></div>
+          </div>
+
+          <article class="table-card portal-card">
+            <div class="table-card__heading"><div><h2>Current portfolio</h2><p>Four active platform investments</p></div><span class="status-pill">All current</span></div>
+            <div class="table-scroll">
+              <table class="investment-table">
+                <caption>Current portfolio holdings</caption>
+                <thead><tr><th scope="col">Company</th><th scope="col">Status</th><th scope="col">Ownership</th><th scope="col">Invested</th><th scope="col">Current value</th><th scope="col">Multiple</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row"><span class="company-mark company-mark--one">NI</span><span><strong>Northstar Industrial</strong><small>Industrial technology</small></span></th><td data-label="Status"><span class="status-dot">Operating</span></td><td data-label="Ownership">42.0%</td><td data-label="Invested">$1.20M</td><td data-label="Current value"><strong>$1.52M</strong></td><td data-label="Multiple">1.27×</td></tr>
+                  <tr><th scope="row"><span class="company-mark company-mark--two">AF</span><span><strong>Atlas Field Services</strong><small>Infrastructure services</small></span></th><td data-label="Status"><span class="status-dot">Operating</span></td><td data-label="Ownership">38.5%</td><td data-label="Invested">$1.05M</td><td data-label="Current value"><strong>$1.24M</strong></td><td data-label="Multiple">1.18×</td></tr>
+                  <tr><th scope="row"><span class="company-mark company-mark--three">MC</span><span><strong>Meridian Compliance</strong><small>Business services</small></span></th><td data-label="Status"><span class="status-dot">Operating</span></td><td data-label="Ownership">31.2%</td><td data-label="Invested">$900K</td><td data-label="Current value"><strong>$1.08M</strong></td><td data-label="Multiple">1.20×</td></tr>
+                  <tr><th scope="row"><span class="company-mark company-mark--four">HS</span><span><strong>Harbor Systems</strong><small>Vertical software</small></span></th><td data-label="Status"><span class="status-dot">Operating</span></td><td data-label="Ownership">27.0%</td><td data-label="Invested">$700K</td><td data-label="Current value"><strong>$780K</strong></td><td data-label="Multiple">1.11×</td></tr>
+                </tbody>
+                <tfoot><tr><th scope="row">Total portfolio</th><td></td><td></td><td data-label="Invested"><strong>$3.85M</strong></td><td data-label="Current value"><strong>$4.62M</strong></td><td data-label="Multiple"><strong>1.20×</strong></td></tr></tfoot>
+              </table>
+            </div>
+          </article>
+
+          <div class="investment-note portal-card">
+            <span aria-hidden="true">i</span>
+            <p><strong>About these values</strong> Current values reflect the most recent quarterly valuation and may differ from realized proceeds.</p>
+          </div>
+        </section>
+
+        <section class="portal-panel" data-panel="documents" hidden>
+          <div class="panel-heading panel-heading--compact">
+            <div><p class="eyebrow">Reporting</p><h1>Documents</h1><p>Statements, tax materials, notices, and investor reports.</p></div>
+          </div>
+
+          <div class="document-filters" role="group" aria-label="Filter documents">
+            <button type="button" data-document-filter="all" aria-pressed="true">All</button>
+            <button type="button" data-document-filter="reports" aria-pressed="false">Reports</button>
+            <button type="button" data-document-filter="tax" aria-pressed="false">Tax</button>
+            <button type="button" data-document-filter="statements" aria-pressed="false">Statements</button>
+            <button type="button" data-document-filter="notices" aria-pressed="false">Notices</button>
+          </div>
+
+          <div class="document-list portal-card">
+            <article class="document-row" data-document-row data-document-id="q2-report" data-document-type="reports">
+              <span class="document-icon" aria-hidden="true">PDF</span><div><h2>Q2 2026 Investor Report</h2><p>Quarterly report · June 30, 2026 · 2.4 MB</p></div><span class="document-badge">New</span><button type="button" data-document-action="Q2 2026 Investor Report">View <span class="sr-only">Q2 2026 Investor Report</span></button>
+            </article>
+            <article class="document-row" data-document-row data-document-id="k1-2025" data-document-type="tax">
+              <span class="document-icon" aria-hidden="true">PDF</span><div><h2>2025 Schedule K-1</h2><p>Tax document · March 12, 2026 · 684 KB</p></div><span></span><button type="button" data-document-action="2025 Schedule K-1">View <span class="sr-only">2025 Schedule K-1</span></button>
+            </article>
+            <article class="document-row" data-document-row data-document-id="q2-statement" data-document-type="statements">
+              <span class="document-icon" aria-hidden="true">PDF</span><div><h2>Q2 Capital Account Statement</h2><p>Account statement · June 30, 2026 · 812 KB</p></div><span></span><button type="button" data-document-action="Q2 Capital Account Statement">View <span class="sr-only">Q2 Capital Account Statement</span></button>
+            </article>
+            <article class="document-row" data-document-row data-document-id="call-06" data-document-type="notices">
+              <span class="document-icon" aria-hidden="true">PDF</span><div><h2>Capital Call Notice 06</h2><p>Capital notice · May 6, 2026 · 428 KB</p></div><span></span><button type="button" data-document-action="Capital Call Notice 06">View <span class="sr-only">Capital Call Notice 06</span></button>
+            </article>
+            <div class="document-empty" data-document-empty hidden><p>No documents match this filter.</p><button type="button" class="secondary-button" data-document-reset>Show all documents</button></div>
+          </div>
+        </section>
+
+        <section class="portal-panel" data-panel="account" hidden>
+          <div class="panel-heading panel-heading--compact">
+            <div><p class="eyebrow">Profile &amp; security</p><h1>Account</h1><p>Manage your investor profile and access preferences.</p></div>
+          </div>
+
+          <div class="account-grid">
+            <article class="account-card portal-card">
+              <div class="account-card__heading"><span class="profile-avatar profile-avatar--large" aria-hidden="true">JL</span><div><h2>Jordan Lee</h2><p>Primary investor contact</p></div></div>
+              <dl class="account-details">
+                <div><dt>Email address</dt><dd>jordan.lee@example.com</dd></div>
+                <div><dt>Investor entity</dt><dd>Lee Family Investments LLC</dd></div>
+                <div><dt>Fund</dt><dd>Gradient Growth Fund I</dd></div>
+              </dl>
+              <button type="button" class="secondary-button" data-profile-edit>Request profile update</button>
+            </article>
+
+            <article class="security-card portal-card">
+              <div class="security-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 2.8 8.5 7 10 4.2-1.5 7-5.5 7-10V6l-7-3Zm0 5v5m0 3h.01" /></svg></div>
+              <p class="eyebrow">Account security</p>
+              <h2>Multi-factor authentication</h2>
+              <p>Add an authenticator app to protect your account with a one-time code.</p>
+              <div class="security-status"><span>Current status</span><strong>Not enabled</strong></div>
+              <button type="button" class="primary-button" data-mfa-info>Set up MFA</button>
+            </article>
+
+            <article class="preferences-card portal-card">
+              <div class="card-heading"><div><span>Communications</span><h2>Delivery preferences</h2></div></div>
+              <label class="preference-row"><span><strong>Quarterly reports</strong><small>Receive an email when a new report is posted.</small></span><input type="checkbox" checked /></label>
+              <label class="preference-row"><span><strong>Capital notices</strong><small>Receive email alerts for calls and distributions.</small></span><input type="checkbox" checked /></label>
+              <label class="preference-row"><span><strong>Firm updates</strong><small>Occasional news from the Gradient team.</small></span><input type="checkbox" /></label>
+              <button type="button" class="secondary-button" data-save-preferences>Save preferences</button>
+            </article>
+          </div>
+
+          <button class="account-signout" type="button" data-sign-out>Sign out of investor portal</button>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="portal-toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="auth-client.js"></script>
+  <script src="portal-state.js"></script>
+  <script src="portal.js"></script>
+</body>
+</html>
