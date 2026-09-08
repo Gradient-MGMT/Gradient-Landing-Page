@@ -1,0 +1,163 @@
+@font-face {
+  font-family: "Gradient Geist";
+  src: url("assets/brand/geist-variable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+.portal-shell {
+  --gradient-black: #0d0d0d;
+  --gradient-eggshell: #f9f9f9;
+  --gradient-navy: #01184d;
+  --gradient-royal: #0e389b;
+  --gradient-dusk: #5566c6;
+  --gradient-tang: #6684db;
+  --gradient-orchard: #9a9ad9;
+  --gradient-sunrise: #c7c4ef;
+  --gradient-citrus: #ffaa17;
+  --gradient-butter: #ffdc17;
+  --gradient-peach: #efb4c8;
+  --gradient-lychee: #f5e5d6;
+  --portal-muted: #667085;
+  --portal-border: rgba(1, 24, 77, 0.14);
+  --portal-card: #ffffff;
+  --portal-shadow: 0 24px 70px rgba(1, 24, 77, 0.1);
+  background: var(--gradient-eggshell);
+  color: var(--gradient-black);
+  font-family: "Gradient Geist", "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.portal-shell,
+.portal-shell * {
+  box-sizing: border-box;
+}
+
+.portal-shell button,
+.portal-shell input {
+  font: inherit;
+}
+
+.portal-shell button,
+.portal-shell a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.portal-shell button {
+  cursor: pointer;
+}
+
+.portal-shell a {
+  color: inherit;
+}
+
+.portal-shell :focus-visible {
+  outline: 3px solid rgba(102, 132, 219, 0.72);
+  outline-offset: 3px;
+}
+
+.portal-shell [hidden] {
+  display: none !important;
+}
+
+.portal-shell .primary-button,
+.portal-shell .secondary-button {
+  min-height: 48px;
+  border-radius: 12px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  font-weight: 620;
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.portal-shell .primary-button {
+  background: var(--gradient-navy);
+  color: #fff;
+}
+
+.portal-shell .primary-button:hover {
+  background: #082665;
+  transform: translateY(-1px);
+}
+
+.portal-shell .primary-button:disabled {
+  cursor: wait;
+  opacity: 0.66;
+  transform: none;
+}
+
+.portal-shell .secondary-button {
+  border-color: var(--portal-border);
+  background: transparent;
+  color: var(--gradient-navy);
+}
+
+.portal-shell .field {
+  display: grid;
+  gap: 8px;
+}
+
+.portal-shell .field label {
+  color: var(--gradient-navy);
+  font-size: 0.875rem;
+  font-weight: 620;
+}
+
+.portal-shell .field input {
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid rgba(1, 24, 77, 0.2);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--gradient-black);
+  padding: 0 14px;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.portal-shell .field input:hover {
+  border-color: rgba(1, 24, 77, 0.38);
+}
+
+.portal-shell .field input:focus {
+  border-color: var(--gradient-royal);
+  box-shadow: 0 0 0 4px rgba(102, 132, 219, 0.16);
+  outline: none;
+}
+
+.portal-shell .field input[aria-invalid="true"] {
+  border-color: #b42318;
+}
+
+.portal-shell .field-error {
+  min-height: 18px;
+  color: #9f2016;
+  font-size: 0.8125rem;
+}
+
+.portal-shell .eyebrow {
+  color: var(--gradient-royal);
+  font-size: 0.75rem;
+  font-weight: 660;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.portal-shell .portal-card {
+  border: 1px solid var(--portal-border);
+  border-radius: 20px;
+  background: var(--portal-card);
+  box-shadow: 0 12px 32px rgba(1, 24, 77, 0.045);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-shell *,
+  .portal-shell *::before,
+  .portal-shell *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
