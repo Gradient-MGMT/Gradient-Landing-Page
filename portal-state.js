@@ -15,9 +15,14 @@
     return isMobile && !isOpen;
   }
 
+  function shouldDisableWorkspace({ isMobile, isOpen }) {
+    return isMobile && isOpen;
+  }
+
   window.GradientPortalState = Object.freeze({
     normalizePanel,
     filterDocuments,
     shouldDisableSidebar,
+    shouldDisableWorkspace,
   });
 })();

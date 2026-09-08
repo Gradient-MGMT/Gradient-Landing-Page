@@ -1,10 +1,11 @@
 (() => {
   const auth = window.GradientAuth;
+  const flow = window.GradientAuthFlow;
   const loginForm = document.querySelector("#login-form");
   const mfaForm = document.querySelector("#mfa-form");
   const status = document.querySelector("#auth-status");
 
-  if (!auth || !loginForm || !mfaForm || !status) return;
+  if (!auth || !flow || !loginForm || !mfaForm || !status) return;
 
   if (auth.getSession().authenticated) {
     window.location.replace("portal.html");
@@ -19,6 +20,7 @@
   const forgotPassword = loginForm.querySelector("[data-forgot-password]");
   const codeInput = mfaForm.elements.code;
   const mfaBack = mfaForm.querySelector("[data-mfa-back]");
+  const mfaSubmitButton = mfaForm.querySelector("button[type='submit']");
   let challengeId = "";
 
   function setStatus(message = "", tone = "neutral") {
@@ -71,13 +73,22 @@
     clearLoginErrors();
     setBusy(true);
 
-    const result = await auth.signIn({
-      email: emailInput.value,
-      password: passwordInput.value,
-    });
+    const result = await flow.settle(
+      () => auth.signIn({
+        email: emailInput.value,
+        password: passwordInput.value,
+      }),
+      () => {
+        passwordInput.value = "";
+        setBusy(false);
+      },
+    );
 
-    passwordInput.value = "";
-    setBusy(false);
+    if (result.status === "unexpected_error") {
+      setStatus("We couldn't sign you in. Please try again or contact Gradient Investor Relations.", "error");
+      emailInput.focus();
+      return;
+    }
 
     if (result.status === "error") {
       Object.entries(result.fields || {}).forEach(([name, message]) => {
@@ -101,13 +112,26 @@
     event.preventDefault();
     setFieldError("code");
     setStatus("Verifying your code…");
+    mfaSubmitButton.disabled = true;
+    mfaSubmitButton.setAttribute("aria-busy", "true");
 
-    const result = await auth.verifyChallenge({
-      challengeId,
-      code: codeInput.value.trim(),
-    });
+    const result = await flow.settle(
+      () => auth.verifyChallenge({
+        challengeId,
+        code: codeInput.value.trim(),
+      }),
+      () => {
+        codeInput.value = "";
+        mfaSubmitButton.disabled = false;
+        mfaSubmitButton.setAttribute("aria-busy", "false");
+      },
+    );
 
-    codeInput.value = "";
+    if (result.status === "unexpected_error") {
+      setStatus("We couldn't verify that code. Please try again or contact Gradient Investor Relations.", "error");
+      codeInput.focus();
+      return;
+    }
 
     if (result.status === "error") {
       setFieldError("code", result.fields?.code || result.message);

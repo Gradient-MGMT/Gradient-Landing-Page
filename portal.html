@@ -12,7 +12,7 @@
 </head>
 <body class="portal-shell portal-app">
   <div class="portal-frame">
-    <aside class="portal-sidebar" aria-label="Portal navigation">
+    <aside id="portal-sidebar" class="portal-sidebar" aria-label="Portal navigation">
       <div>
         <a class="portal-logo portal-sidebar__logo" href="index.html" aria-label="Gradient MGMT home">
           <img src="assets/brand/logo-white.svg" alt="" />
@@ -56,7 +56,7 @@
 
     <div class="portal-workspace">
       <header class="portal-header">
-        <button class="mobile-menu-button" type="button" data-mobile-menu aria-label="Open navigation" aria-expanded="false">
+        <button class="mobile-menu-button" type="button" data-mobile-menu aria-label="Open navigation" aria-controls="portal-sidebar" aria-expanded="false">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
         </button>
         <div class="portal-header__context">
@@ -64,12 +64,12 @@
           <strong data-header-title>Portfolio overview</strong>
         </div>
         <div class="profile-control">
-          <button class="profile-button" type="button" data-profile-toggle aria-expanded="false">
+          <button class="profile-button" type="button" data-profile-toggle aria-controls="profile-menu" aria-expanded="false">
             <span class="profile-avatar" aria-hidden="true">JL</span>
             <span class="profile-button__copy"><strong>Jordan Lee</strong><small>Investor</small></span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4" /></svg>
           </button>
-          <div class="profile-menu" data-profile-menu hidden>
+          <div id="profile-menu" class="profile-menu" data-profile-menu hidden>
             <div class="profile-menu__identity">
               <strong>Jordan Lee</strong>
               <span>jordan.lee@example.com</span>
@@ -274,6 +274,45 @@
       </main>
     </div>
   </div>
+
+  <dialog class="document-preview" data-document-preview aria-labelledby="document-preview-title">
+    <div class="document-preview__surface">
+      <header class="document-preview__header">
+        <div class="document-preview__identity">
+          <span class="document-icon" aria-hidden="true">PDF</span>
+          <div>
+            <span>Investor document</span>
+            <h2 id="document-preview-title" data-document-preview-title>Document preview</h2>
+            <p data-document-preview-meta></p>
+          </div>
+        </div>
+        <button type="button" class="document-preview__close" data-document-preview-close aria-label="Close document preview">×</button>
+      </header>
+
+      <div class="document-preview__viewport">
+        <article class="document-preview__page" aria-label="Document preview page">
+          <div class="document-preview__page-header">
+            <img src="assets/brand/logo-navy.svg" alt="Gradient MGMT" />
+            <span>Confidential</span>
+          </div>
+          <p class="eyebrow">Investor materials</p>
+          <h3 data-document-page-title>Document preview</h3>
+          <div class="document-preview__rule"></div>
+          <dl class="document-preview__details">
+            <div><dt>Fund</dt><dd>Gradient Growth Fund I</dd></div>
+            <div><dt>Investor</dt><dd>Lee Family Investments LLC</dd></div>
+            <div><dt>Status</dt><dd>Final</dd></div>
+          </dl>
+          <div class="document-preview__lines" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+        </article>
+      </div>
+
+      <footer class="document-preview__footer">
+        <span>Secure document preview</span>
+        <button type="button" class="secondary-button" data-document-preview-close>Close preview</button>
+      </footer>
+    </div>
+  </dialog>
 
   <div class="portal-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 

@@ -26,19 +26,33 @@
   const mobileMenu = document.querySelector("[data-mobile-menu]");
   const mobileScrim = document.querySelector("[data-mobile-scrim]");
   const sidebar = document.querySelector(".portal-sidebar");
+  const workspace = document.querySelector(".portal-workspace");
   const toast = document.querySelector(".portal-toast");
   const documentRows = [...document.querySelectorAll("[data-document-row]")];
   const documentFilters = [...document.querySelectorAll("[data-document-filter]")];
   const documentEmpty = document.querySelector("[data-document-empty]");
+  const documentPreview = document.querySelector("[data-document-preview]");
+  const documentPreviewTitle = document.querySelector("[data-document-preview-title]");
+  const documentPageTitle = document.querySelector("[data-document-page-title]");
+  const documentPreviewMeta = document.querySelector("[data-document-preview-meta]");
   const mobileLayout = window.matchMedia("(max-width: 820px)");
   let toastTimer;
+  let documentTrigger;
 
   function syncSidebarAccessibility() {
-    if (!sidebar) return;
-    sidebar.inert = state.shouldDisableSidebar({
+    if (!sidebar || !workspace) return;
+    const drawerState = {
       isMobile: mobileLayout.matches,
       isOpen: sidebar.classList.contains("is-open"),
-    });
+    };
+    sidebar.inert = state.shouldDisableSidebar(drawerState);
+    workspace.inert = state.shouldDisableWorkspace(drawerState);
+  }
+
+  function getSidebarFocusableControls() {
+    if (!sidebar) return [];
+    return [...sidebar.querySelectorAll("a[href], button:not([disabled])")]
+      .filter((control) => control.getClientRects().length > 0);
   }
 
   function closeProfileMenu({ restoreFocus = false } = {}) {
@@ -129,8 +143,31 @@
 
   document.querySelectorAll("[data-document-action]").forEach((button) => {
     button.addEventListener("click", () => {
-      showToast(`Opening ${button.dataset.documentAction}…`);
+      if (!documentPreview?.showModal) {
+        showToast(`${button.dataset.documentAction} preview is unavailable.`);
+        return;
+      }
+      const row = button.closest("[data-document-row]");
+      const title = button.dataset.documentAction;
+      documentTrigger = button;
+      if (documentPreviewTitle) documentPreviewTitle.textContent = title;
+      if (documentPageTitle) documentPageTitle.textContent = title;
+      if (documentPreviewMeta) documentPreviewMeta.textContent = row?.querySelector("p")?.textContent || "Investor document";
+      documentPreview.showModal();
     });
+  });
+
+  document.querySelectorAll("[data-document-preview-close]").forEach((button) => {
+    button.addEventListener("click", () => documentPreview?.close());
+  });
+
+  documentPreview?.addEventListener("click", (event) => {
+    if (event.target === documentPreview) documentPreview.close();
+  });
+
+  documentPreview?.addEventListener("close", () => {
+    documentTrigger?.focus();
+    documentTrigger = null;
   });
 
   document.querySelectorAll("[data-sign-out]").forEach((button) => {
@@ -160,12 +197,14 @@
 
   mobileMenu?.addEventListener("click", () => {
     const willOpen = !sidebar.classList.contains("is-open");
+    if (willOpen) closeProfileMenu();
     sidebar.classList.toggle("is-open", willOpen);
     mobileMenu.setAttribute("aria-expanded", String(willOpen));
     mobileMenu.setAttribute("aria-label", willOpen ? "Close navigation" : "Open navigation");
     mobileScrim.hidden = !willOpen;
     document.body.classList.toggle("portal-menu-open", willOpen);
     syncSidebarAccessibility();
+    if (willOpen) getSidebarFocusableControls()[0]?.focus();
   });
 
   mobileScrim?.addEventListener("click", () => closeMobileMenu({ restoreFocus: true }));
@@ -178,6 +217,19 @@
   });
 
   document.addEventListener("keydown", (event) => {
+    if (event.key === "Tab" && mobileLayout.matches && sidebar?.classList.contains("is-open")) {
+      const controls = getSidebarFocusableControls();
+      const first = controls[0];
+      const last = controls.at(-1);
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+      return;
+    }
     if (event.key !== "Escape") return;
     if (profileMenu && !profileMenu.hidden) closeProfileMenu({ restoreFocus: true });
     if (sidebar?.classList.contains("is-open")) closeMobileMenu({ restoreFocus: true });

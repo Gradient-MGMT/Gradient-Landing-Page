@@ -39,3 +39,11 @@ test("a closed mobile sidebar is removed from keyboard navigation", async () => 
   assert.equal(state.shouldDisableSidebar({ isMobile: true, isOpen: true }), false);
   assert.equal(state.shouldDisableSidebar({ isMobile: false, isOpen: false }), false);
 });
+
+test("an open mobile sidebar disables the background workspace", async () => {
+  const state = await loadState();
+
+  assert.equal(state.shouldDisableWorkspace({ isMobile: true, isOpen: true }), true);
+  assert.equal(state.shouldDisableWorkspace({ isMobile: true, isOpen: false }), false);
+  assert.equal(state.shouldDisableWorkspace({ isMobile: false, isOpen: true }), false);
+});
