@@ -39,3 +39,12 @@ test("the portal redirects before rendering when no session exists", async () =>
   assert.ok(authClient > -1 && authClient < bodyStart);
   assert.ok(loginRedirect > authClient && loginRedirect < bodyStart);
 });
+
+test("the public-page logo scales to the active navigation highlight", async () => {
+  const styles = await projectFile("styles.css");
+
+  assert.match(
+    styles,
+    /\.brand img\s*{[^}]*height:\s*clamp\(18px, calc\(6\.93vw - 35\.21px\), 41px\);/s,
+  );
+});

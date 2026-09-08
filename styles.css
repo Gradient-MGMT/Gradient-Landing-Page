@@ -276,7 +276,7 @@ body.contact .brand img {
 }
 
 .brand img {
-  height: 18px;
+  height: clamp(18px, calc(6.93vw - 35.21px), 41px);
   width: auto;
   display: block;
 }
