@@ -17,12 +17,16 @@ test("About and Contact share the same content alignment and portal navigation",
   }
 });
 
-test("About body copy is one pixel larger", async () => {
+test("About and Contact body copy use the same 14px size", async () => {
   const styles = await projectFile("styles.css");
 
   assert.match(
     styles,
     /\.copy__body p\s*{[^}]*font-size:\s*0\.875rem;/s,
+  );
+  assert.match(
+    styles,
+    /\.page-copy--contact p\s*{[^}]*font-size:\s*0\.875rem;/s,
   );
 });
 
