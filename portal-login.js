@@ -97,6 +97,7 @@
       setStatus(result.message, "error");
       const firstInvalid = loginForm.querySelector("[aria-invalid='true']");
       if (firstInvalid) firstInvalid.focus();
+      else emailInput.focus();
       return;
     }
 

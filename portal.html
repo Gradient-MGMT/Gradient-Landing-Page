@@ -9,6 +9,12 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
   <link rel="stylesheet" href="portal.css?v=1" />
+  <script src="auth-client.js"></script>
+  <script>
+    if (!window.GradientAuth.getSession().authenticated) {
+      window.location.replace("portal-login.html");
+    }
+  </script>
 </head>
 <body class="portal-shell portal-app">
   <div class="portal-frame">
@@ -316,7 +322,6 @@
 
   <div class="portal-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="auth-client.js"></script>
   <script src="portal-state.js"></script>
   <script src="portal.js"></script>
 </body>
