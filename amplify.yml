@@ -8,6 +8,8 @@ frontend:
     baseDirectory: .
     files:
       - '*.html'
+      - 'robots.txt'
+      - 'sitemap.xml'
       - '*.css'
       - '*.js'
       - 'assets/**/*'
