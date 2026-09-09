@@ -70,6 +70,14 @@ test("release artifact contains only the configured public surface", async (t) =
     "styles.css",
   ]);
   assert.equal(await sha256File(release.zipPath), release.manifest.sha256);
+  assert.equal(
+    release.zipPath,
+    join(fixture, ".release", release.manifest.commit, "site.zip"),
+  );
+  assert.equal(
+    release.manifestPath,
+    join(fixture, ".release", release.manifest.commit, "manifest.json"),
+  );
   assert.deepEqual(
     (await execFile("unzip", ["-Z1", release.zipPath])).stdout.trim().split("\n")
       .filter((entry) => !entry.endsWith("/")),

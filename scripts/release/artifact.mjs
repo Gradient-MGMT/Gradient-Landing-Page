@@ -43,8 +43,9 @@ export async function createReleaseArtifact(options = {}) {
   await runTests();
 
   const outputRoot = resolve(cwd, options.outputRoot ?? ".release");
-  await mkdir(outputRoot, { recursive: true });
-  const zipPath = resolve(outputRoot, `${commit}.zip`);
+  const artifactRoot = resolve(outputRoot, commit);
+  await mkdir(artifactRoot, { recursive: true });
+  const zipPath = resolve(artifactRoot, "site.zip");
   await runGit(cwd, ["archive", "--format=zip", `--output=${zipPath}`, commit, "--", ...files]);
 
   const manifest = {
@@ -57,7 +58,7 @@ export async function createReleaseArtifact(options = {}) {
     files,
     createdAt: new Date().toISOString(),
   };
-  const manifestPath = resolve(outputRoot, "manifest.json");
+  const manifestPath = resolve(artifactRoot, "manifest.json");
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 
   return { manifest, manifestPath, zipPath };
