@@ -52,8 +52,10 @@ function recordingAdapter(options = {}) {
     uploaded: [],
     started: [],
     checkedUrls: [],
+    checkedUrlRequests: [],
     async getActiveJobId(branch) {
       calls.push(["getActiveJobId", branch]);
+      await options.onGetActiveJobId?.(branch);
       return branch === "staging"
         ? (options.stagingActiveJobId ?? "staging-new-job")
         : (options.productionActiveJobId ?? "production-42");
@@ -68,7 +70,12 @@ function recordingAdapter(options = {}) {
     },
     async uploadZip(url, path) {
       calls.push(["uploadZip", url, path]);
-      this.uploaded.push({ url, path });
+      const bytes = await readFile(path);
+      this.uploaded.push({
+        url,
+        path,
+        sha256: createHash("sha256").update(bytes).digest("hex"),
+      });
     },
     async startDeployment(branch, jobId) {
       calls.push(["startDeployment", branch, jobId]);
@@ -79,9 +86,10 @@ function recordingAdapter(options = {}) {
       const statuses = statusQueues.get(branch);
       return statuses.length > 1 ? statuses.shift() : statuses[0];
     },
-    async checkUrl(url) {
+    async checkUrl(url, options) {
       calls.push(["checkUrl", url]);
       this.checkedUrls.push(url);
+      this.checkedUrlRequests.push({ url, options });
     },
   };
 }
@@ -146,6 +154,25 @@ test("modified artifacts are rejected before any deployment service call", async
     /artifact checksum mismatch/,
   );
   assert.deepEqual(adapter.calls, []);
+});
+
+test("staging uploads verified bytes when the source ZIP is replaced after verification", async (t) => {
+  const { manifest, receiptPath } = await releaseFixture(t);
+  const adapter = recordingAdapter({
+    async onGetActiveJobId() {
+      await writeFile(manifest.zipPath, "replacement after verification");
+    },
+  });
+
+  const receipt = await deployStaging({
+    manifest,
+    adapter,
+    receiptPath,
+    pollIntervalMs: 0,
+  });
+
+  assert.equal(receipt.sha256, manifest.sha256);
+  assert.equal(adapter.uploaded[0].sha256, manifest.sha256);
 });
 
 test("failed and cancelled staging jobs are terminal failures", async (t) => {
@@ -293,13 +320,18 @@ test("production promotion uploads the staged bytes only after every gate", asyn
   });
 
   assert.deepEqual(adapter.createdBranches, ["main"]);
-  assert.deepEqual(adapter.uploaded, [{
-    url: "https://upload.example.test/main",
-    path: manifest.zipPath,
-  }]);
+  assert.equal(adapter.uploaded[0].url, "https://upload.example.test/main");
+  assert.equal(adapter.uploaded[0].sha256, manifest.sha256);
   assert.deepEqual(adapter.checkedUrls, [
     "https://gradientmgmt.com/",
     "https://www.gradientmgmt.com/",
+  ]);
+  assert.deepEqual(adapter.checkedUrlRequests, [
+    { url: "https://gradientmgmt.com/", options: undefined },
+    {
+      url: "https://www.gradientmgmt.com/",
+      options: { expectedRedirectUrl: "https://gradientmgmt.com/" },
+    },
   ]);
   assert.deepEqual(git.calls, [
     ["requireCommitInOriginMain", manifest.commit],
@@ -309,4 +341,31 @@ test("production promotion uploads the staged bytes only after every gate", asyn
   assert.equal(productionReceipt.branch, "main");
   assert.equal(productionReceipt.sha256, manifest.sha256);
   assert.equal(productionReceipt.status, "SUCCEED");
+  assert.ok(!Object.hasOwn(productionReceipt, "baselineProductionJobId"));
+});
+
+test("production uploads verified bytes when the source ZIP is replaced during gates", async (t) => {
+  const { manifest } = await releaseFixture(t);
+  const receipt = successfulStagingReceipt(manifest);
+  let replaced = false;
+  const adapter = recordingAdapter({
+    async onGetActiveJobId() {
+      if (!replaced) {
+        replaced = true;
+        await writeFile(manifest.zipPath, "replacement during promotion gates");
+      }
+    },
+  });
+
+  const productionReceipt = await promoteProduction({
+    manifest,
+    receipt,
+    confirmation: manifest.sha256,
+    adapter,
+    git: approvedGit(),
+    pollIntervalMs: 0,
+  });
+
+  assert.equal(productionReceipt.sha256, manifest.sha256);
+  assert.equal(adapter.uploaded[0].sha256, manifest.sha256);
 });
