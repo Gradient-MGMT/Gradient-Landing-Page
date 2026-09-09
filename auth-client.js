@@ -2,6 +2,8 @@
   const SESSION_KEY = "gradient_portal_demo_session";
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+  window.sessionStorage.removeItem(SESSION_KEY);
+
   const wait = (duration) => new Promise((resolve) => {
     setTimeout(resolve, duration);
   });
@@ -26,8 +28,11 @@
     }
 
     await wait(350);
-    window.sessionStorage.setItem(SESSION_KEY, "active");
-    return { status: "authenticated" };
+    return {
+      status: "error",
+      message: "We couldn't sign you in. Check your credentials and try again.",
+      fields: {},
+    };
   }
 
   async function verifyChallenge({ challengeId = "", code = "" } = {}) {
@@ -40,8 +45,11 @@
     }
 
     await wait(250);
-    window.sessionStorage.setItem(SESSION_KEY, "active");
-    return { status: "authenticated" };
+    return {
+      status: "error",
+      message: "We couldn't verify that code. Please try again.",
+      fields: { code: "The verification code was not recognized." },
+    };
   }
 
   function getSession() {

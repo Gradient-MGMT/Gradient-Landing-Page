@@ -6,6 +6,18 @@
   padding: 0;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 :root {
   --edge: 56px;
   --section-title-size: 2.5rem;
@@ -276,7 +288,7 @@ body.contact .brand img {
 }
 
 .brand img {
-  height: 18px;
+  height: clamp(18px, calc(6.93vw - 35.21px), 41px);
   width: auto;
   display: block;
 }
@@ -286,27 +298,26 @@ body.contact .pill {
   justify-self: center;
 }
 
-body.contact {
-  overflow: hidden;
-}
-
-.contact-sheet {
+.page-copy {
   position: relative;
   z-index: 2;
-  padding: 2.5rem var(--edge) 4rem;
-  max-width: 36rem;
+  width: min(42rem, calc(100vw - var(--edge) - var(--edge)));
+  margin: 2.5rem auto 4rem;
+  color: var(--page-fg);
+  text-align: left;
 }
 
-.contact-sheet h1 {
+.page-copy h1 {
   margin: 0 0 1rem;
   font-size: var(--section-title-size);
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: -0.03em;
+  line-height: 1.05;
 }
 
-.contact-sheet p {
+.page-copy--contact p {
   margin: 0 0 1.75rem;
-  font-size: 1rem;
+  font-size: 0.875rem;
   line-height: 1.5;
   color: var(--page-muted);
 }
@@ -327,23 +338,6 @@ body.contact {
   outline: none;
 }
 
-.copy {
-  position: fixed;
-  z-index: 2;
-  left: var(--edge);
-  top: 5.75rem;
-  width: min(24rem, 32vw);
-  color: var(--page-fg);
-}
-
-.copy h1 {
-  margin: 0 0 0.65rem;
-  font-size: var(--section-title-size);
-  font-weight: 400;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-}
-
 .copy__body {
   display: flex;
   flex-direction: column;
@@ -352,7 +346,7 @@ body.contact {
 
 .copy__body p {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: -0.01em;
@@ -380,6 +374,7 @@ body.contact {
 
   body.about .top,
   body.contact .top {
+    order: 1;
     padding: 18px 16px 0;
   }
 
@@ -391,20 +386,30 @@ body.contact {
     display: flex;
   }
 
-  .copy {
-    left: var(--edge);
-    right: var(--edge);
-    top: 4.25rem;
-    bottom: auto;
-    width: auto;
+  body.about,
+  body.contact {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
-  .contact-sheet {
-    padding: 1.75rem 1.25rem 3rem;
+  .page-copy {
+    order: 2;
+    width: calc(100vw - var(--edge) - var(--edge));
+    margin: 1.75rem auto 3rem;
   }
 
   .terrain {
-    height: 18vh;
+    position: relative;
+    inset: auto;
+    order: 3;
+    flex: 0 0 30vh;
+    height: 30vh;
+    margin-top: auto;
+    transform: translateX(-14%) scale(1.82, 1);
   }
 
   .terrain path {

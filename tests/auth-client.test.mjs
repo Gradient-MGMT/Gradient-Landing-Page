@@ -3,8 +3,9 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
 
-async function loadAuth() {
+async function loadAuth({ authenticated = false } = {}) {
   const values = new Map();
+  if (authenticated) values.set("gradient_portal_demo_session", "active");
   const window = {
     sessionStorage: {
       getItem: (key) => values.get(key) ?? null,
@@ -17,16 +18,17 @@ async function loadAuth() {
   return { auth: window.GradientAuth, values };
 }
 
-test("valid mock sign-in creates only a demo session", async () => {
+test("all syntactically valid sign-ins are rejected", async () => {
   const { auth, values } = await loadAuth();
   const result = await auth.signIn({
     email: "alex@example.test",
     password: "not-stored",
   });
 
-  assert.equal(result.status, "authenticated");
-  assert.equal(auth.getSession().authenticated, true);
-  assert.deepEqual([...values.values()], ["active"]);
+  assert.equal(result.status, "error");
+  assert.equal(result.message, "We couldn't sign you in. Check your credentials and try again.");
+  assert.equal(auth.getSession().authenticated, false);
+  assert.deepEqual([...values.values()], []);
 });
 
 test("invalid credentials return both field errors", async () => {
@@ -45,17 +47,22 @@ test("invalid MFA input leaves the session signed out", async () => {
   assert.equal(auth.getSession().authenticated, false);
 });
 
-test("valid MFA input completes the demo session", async () => {
+test("valid MFA input cannot create a session", async () => {
   const { auth } = await loadAuth();
   const result = await auth.verifyChallenge({ challengeId: "demo", code: "123456" });
 
-  assert.equal(result.status, "authenticated");
-  assert.equal(auth.getSession().authenticated, true);
+  assert.equal(result.status, "error");
+  assert.equal(auth.getSession().authenticated, false);
 });
 
-test("sign-out clears the demo session", async () => {
-  const { auth } = await loadAuth();
-  await auth.signIn({ email: "alex@example.test", password: "temporary" });
+test("loading the auth client clears any stale demo session", async () => {
+  const { auth } = await loadAuth({ authenticated: true });
+
+  assert.equal(auth.getSession().authenticated, false);
+});
+
+test("sign-out keeps the session unauthenticated", async () => {
+  const { auth } = await loadAuth({ authenticated: true });
 
   auth.signOut();
 
