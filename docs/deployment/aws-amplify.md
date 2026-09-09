@@ -1,6 +1,8 @@
-# AWS Amplify production deployment
+# AWS Amplify staging-first release operations
 
-This runbook publishes the static Gradient Management site from GitHub with AWS Amplify Hosting, serves `gradientmgmt.com` and `www.gradientmgmt.com` over HTTPS, and preserves every existing email and service record while DNS authority moves from GoDaddy to Route 53.
+This runbook operates the manually deployed Gradient Management site in AWS Amplify app `dmm14gzm5vsts` in `us-east-1`. The `main` branch serves `gradientmgmt.com` and `www.gradientmgmt.com`; the public `staging` branch serves `https://staging.dmm14gzm5vsts.amplifyapp.com`. Both branches remain manual. Git merges and pushes do not deploy them.
+
+The production branch is `main`; main already serves the current feature revision. This staging-first gate governs the next change and every later release; it cannot retroactively stage what is already live.
 
 ## Ownership boundary
 
@@ -9,23 +11,48 @@ This runbook publishes the static Gradient Management site from GitHub with AWS 
 - The domain remains registered at GoDaddy. Changing nameservers is not a domain transfer.
 - Do not use the mock investor portal as a production authentication system. It is a visual prototype with sample data, not a secure document repository.
 
-## 1. Merge and connect the repository
+## 1. Release through staging
 
-1. Merge the reviewed investor-portal pull request into `main`.
-2. Sign in to the intended Gradient Management AWS account and note the account ID in the deployment record.
-3. Open **AWS Amplify** in the team's standard production region. If there is no existing standard, use `us-east-1` and record that decision.
-4. Choose **Create new app** and **GitHub** as the repository provider.
-5. Authorize the AWS Amplify GitHub App for `Gradient-MGMT/Gradient-Landing-Page` only, unless broader access is intentionally required.
-6. Select the repository and the `main` branch.
-7. Confirm that Amplify detects the committed `amplify.yml`. Its artifact list deliberately publishes only root HTML, CSS, JavaScript, and `assets/`; it does not publish tests or internal documentation.
-8. Name the app `gradient-landing-page`, enable automatic deployments for `main`, and deploy.
-9. Open the temporary `amplifyapp.com` URL and verify:
-   - Home, About, Contact, and Investor Login load.
-   - The mock login redirects to the investor portal.
-   - CSS, fonts, logos, and images load without 404 errors.
-   - The browser console has no errors.
+Before starting, confirm the worktree is clean, fetch `origin`, and run the full test suite. Use only `scripts/amplify-release.mjs`; it deliberately offers no generic branch selector.
 
-Do not start the nameserver cutover if the Amplify URL does not pass these checks.
+1. Package the clean reviewed commit:
+
+   ```sh
+   node scripts/amplify-release.mjs package
+   ```
+
+   Copy the exact manifest path, full commit, SHA-256 digest, and active production job ID printed by the command into the release record. The production job is shown for operator visibility only; AWS baseline state is not stored in the deterministic package manifest.
+
+2. Deploy only that manifest to `staging`:
+
+   ```sh
+   node scripts/amplify-release.mjs deploy-staging .release/<full-commit-sha>/manifest.json
+   ```
+
+   This captures the active `main` job immediately before staging deployment and records it in the staging receipt. It then uploads the packaged ZIP, waits for success, and checks `https://staging.dmm14gzm5vsts.amplifyapp.com`.
+
+3. Verify the recorded deployment without creating another deployment:
+
+   ```sh
+   node scripts/amplify-release.mjs verify <manifest-path> <staging-receipt-path>
+   ```
+
+4. Review Home, About, Contact, and Investor Login at the public staging URL on desktop and at 390×844. Confirm navigation and assets load, the browser console is clear, `/portal.html` redirects to login, and the current mock authentication deliberately must reject every sign-in. Confirm `robots.txt`, `sitemap.xml`, canonical tags, and the `noindex` investor-page directives.
+
+5. Stop and obtain explicit approval that names this staging URL and the complete SHA-256 digest. Any source change invalidates the approval and requires a new package, staging deployment, receipt, and review.
+
+6. After the approved commit is incorporated into `origin/main`, confirm local `main` is clean and equals `origin/main`. Promote only with the approved digest:
+
+   ```sh
+   node scripts/amplify-release.mjs promote \
+     <manifest-path> \
+     <staging-receipt-path> \
+     --confirm-production=<full-sha256>
+   ```
+
+   Promotion rechecks the artifact, successful active staging job, unchanged production baseline, and Git state before creating a `main` deployment. Production receives the exact same ZIP bytes reviewed on staging; never rebuild between approval and promotion.
+
+7. Verify production and retain its receipt together with the known-good production artifact. Do not depend on Amplify job history as the rollback source because prior manual deployment ZIPs cannot be downloaded from it.
 
 ## 2. Inventory GoDaddy before changing anything
 
@@ -101,7 +128,9 @@ DNS propagation can take up to 48 hours. Monitor during that period and keep the
 
 ## Rollback
 
-If a critical service fails because Route 53 is missing or misconfiguring a record:
+For a site-release rollback, locate the retained known-good production artifact and receipt, verify its recorded digest, and redeploy that exact ZIP to `main` with a fresh manual Amplify deployment. Do not rebuild the old commit and do not use Amplify job history as the artifact source. Record and verify the new rollback job just like any production deployment.
+
+For a DNS rollback, if a critical service fails because Route 53 is missing or misconfiguring a record:
 
 1. Ask Daniel to restore the original nameservers captured in GRA-415.
 2. Record the rollback submission time.
