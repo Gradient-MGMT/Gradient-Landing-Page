@@ -72,14 +72,14 @@ function recordingAdapter(options = {}) {
       calls.push(["getActiveJobId", branch]);
       await options.onGetActiveJobId?.(branch);
       return branch === "staging"
-        ? (options.stagingActiveJobId ?? "staging-new-job")
-        : (options.productionActiveJobId ?? "production-42");
+        ? (options.stagingActiveJobId ?? "1")
+        : (options.productionActiveJobId ?? "42");
     },
     async createDeployment(branch) {
       calls.push(["createDeployment", branch]);
       this.createdBranches.push(branch);
       return {
-        jobId: `${branch}-new-job`,
+        jobId: branch === "staging" ? "1" : "43",
         zipUploadUrl: `https://upload.example.test/${branch}`,
       };
     },
@@ -129,10 +129,10 @@ function successfulStagingReceipt(manifest) {
     version: 1,
     environment: "staging",
     branch: "staging",
-    jobId: "staging-new-job",
+    jobId: "1",
     commit: manifest.commit,
     sha256: manifest.sha256,
-    baselineProductionJobId: "production-42",
+    baselineProductionJobId: "42",
     status: "SUCCEED",
     deployedAt: "2026-09-09T12:05:00.000Z",
   };
@@ -153,7 +153,7 @@ test("staging deployment can target only staging and writes a successful receipt
   assert.equal(receipt.environment, "staging");
   assert.deepEqual(adapter.createdBranches, ["staging"]);
   assert.equal(receipt.sha256, manifest.sha256);
-  assert.equal(receipt.baselineProductionJobId, "production-42");
+  assert.equal(receipt.baselineProductionJobId, "42");
   assert.deepEqual(JSON.parse(await readFile(receiptPath, "utf8")), receipt);
   assert.deepEqual(adapter.checkedUrls, STAGING_ENDPOINTS);
   assert.deepEqual(adapter.calls.slice(0, 2), [
@@ -248,11 +248,25 @@ test("deployment verification checks the active job and every required staging e
   assert.deepEqual(adapter.checkedUrls, STAGING_ENDPOINTS);
 });
 
+test("deployment verification accepts the same job ID with AWS zero padding", async (t) => {
+  const { manifest } = await releaseFixture(t);
+  const receipt = {
+    ...successfulStagingReceipt(manifest),
+    jobId: "1",
+  };
+  const adapter = recordingAdapter({
+    stagingActiveJobId: "0000000001",
+    stagingStatuses: ["SUCCEED"],
+  });
+
+  await assert.doesNotReject(verifyDeployment({ manifest, receipt, adapter }));
+});
+
 test("deployment verification rejects an obsolete receipt", async (t) => {
   const { manifest } = await releaseFixture(t);
   const receipt = successfulStagingReceipt(manifest);
   const adapter = recordingAdapter({
-    stagingActiveJobId: "staging-newer-job",
+    stagingActiveJobId: "2",
     stagingStatuses: ["SUCCEED"],
   });
 
@@ -261,6 +275,33 @@ test("deployment verification rejects an obsolete receipt", async (t) => {
     /deployment receipt is not the active branch deployment/,
   );
   assert.deepEqual(adapter.checkedUrls, []);
+});
+
+test("deployment verification rejects malformed receipt and active job IDs", async (t) => {
+  const invalidCases = [
+    { receiptJobId: "job-1", activeJobId: "job-1" },
+    { receiptJobId: "1", activeJobId: "0000000001unexpected" },
+  ];
+
+  for (const invalidCase of invalidCases) {
+    await t.test(JSON.stringify(invalidCase), async (t) => {
+      const { manifest } = await releaseFixture(t);
+      const receipt = {
+        ...successfulStagingReceipt(manifest),
+        jobId: invalidCase.receiptJobId,
+      };
+      const adapter = recordingAdapter({
+        stagingActiveJobId: invalidCase.activeJobId,
+        stagingStatuses: ["SUCCEED"],
+      });
+
+      await assert.rejects(
+        verifyDeployment({ manifest, receipt, adapter }),
+        /deployment receipt is not the active branch deployment/,
+      );
+      assert.deepEqual(adapter.checkedUrls, []);
+    });
+  }
 });
 
 test("deployment verification rejects a missing required endpoint", async (t) => {
@@ -304,7 +345,7 @@ test("production promotion rejects stale staging and changed production", async 
   const { manifest } = await releaseFixture(t);
   const receipt = successfulStagingReceipt(manifest);
 
-  const staleStagingAdapter = recordingAdapter({ stagingActiveJobId: "staging-newer-job" });
+  const staleStagingAdapter = recordingAdapter({ stagingActiveJobId: "2" });
   await assert.rejects(
     promoteProduction({
       manifest,
@@ -319,7 +360,7 @@ test("production promotion rejects stale staging and changed production", async 
 
   const changedProductionAdapter = recordingAdapter({
     stagingActiveJobId: receipt.jobId,
-    productionActiveJobId: "production-43",
+    productionActiveJobId: "43",
   });
   await assert.rejects(
     promoteProduction({
@@ -369,7 +410,10 @@ test("production promotion rejects local main differing from origin/main", async
 test("production promotion uploads the staged bytes only after every gate", async (t) => {
   const { manifest } = await releaseFixture(t);
   const receipt = successfulStagingReceipt(manifest);
-  const adapter = recordingAdapter();
+  const adapter = recordingAdapter({
+    stagingActiveJobId: "0000000001",
+    productionActiveJobId: "0000000042",
+  });
   const git = approvedGit();
 
   const productionReceipt = await promoteProduction({

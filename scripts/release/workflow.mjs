@@ -73,6 +73,21 @@ function assertReceiptMatchesManifest(manifest, receipt) {
   }
 }
 
+function canonicalJobId(value) {
+  if (typeof value !== "string" || !/^\d+$/.test(value)) return null;
+  return value.replace(/^0+(?=\d)/, "");
+}
+
+function jobIdsMatch(left, right) {
+  const canonicalLeft = canonicalJobId(left);
+  const canonicalRight = canonicalJobId(right);
+  return canonicalLeft !== null && canonicalLeft === canonicalRight;
+}
+
+function jobBaselinesMatch(left, right) {
+  return (left === null && right === null) || jobIdsMatch(left, right);
+}
+
 function urlChecksForBranch(branch) {
   if (branch === RELEASE.stagingBranch) {
     return REQUIRED_PUBLIC_PATHS.map((path) => ({
@@ -158,7 +173,7 @@ export async function verifyDeployment({ manifest, receipt, adapter }) {
   if (receipt.status !== "SUCCEED") {
     throw new Error("deployment receipt is not successful");
   }
-  if (await adapter.getActiveJobId(receipt.branch) !== receipt.jobId) {
+  if (!jobIdsMatch(await adapter.getActiveJobId(receipt.branch), receipt.jobId)) {
     throw new Error("deployment receipt is not the active branch deployment");
   }
   const status = await adapter.getJobStatus(receipt.branch, receipt.jobId);
@@ -186,10 +201,13 @@ export async function promoteProduction({
     if (receipt.status !== "SUCCEED") {
       throw new Error("staging deployment did not succeed");
     }
-    if (await adapter.getActiveJobId(RELEASE.stagingBranch) !== receipt.jobId) {
+    if (!jobIdsMatch(await adapter.getActiveJobId(RELEASE.stagingBranch), receipt.jobId)) {
       throw new Error("staging receipt is not the active successful deployment");
     }
-    if (await adapter.getActiveJobId(RELEASE.productionBranch) !== receipt.baselineProductionJobId) {
+    if (!jobBaselinesMatch(
+      await adapter.getActiveJobId(RELEASE.productionBranch),
+      receipt.baselineProductionJobId,
+    )) {
       throw new Error("production changed during review");
     }
     await git.requireCommitInOriginMain(manifest.commit);
