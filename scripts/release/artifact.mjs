@@ -17,6 +17,43 @@ async function sha256File(path) {
   return createHash("sha256").update(await readFile(path)).digest("hex");
 }
 
+function isSafeRelativePath(path) {
+  return typeof path === "string" &&
+    path !== "" &&
+    !path.startsWith("/") &&
+    !path.includes("\\") &&
+    path.split("/").every((segment) => segment !== "" && segment !== "." && segment !== "..");
+}
+
+function validateArtifactFiles(files) {
+  if (!Array.isArray(files)) {
+    throw new Error("artifact files must be an array");
+  }
+
+  const seen = new Set();
+  for (const path of files) {
+    if (!isSafeRelativePath(path)) {
+      throw new Error("artifact contains unsafe path");
+    }
+    if (seen.has(path)) {
+      throw new Error("artifact contains duplicate path");
+    }
+    if (!isPublicFile(path)) {
+      throw new Error("artifact contains non-public path");
+    }
+    seen.add(path);
+  }
+
+  if (!seen.has("index.html")) {
+    throw new Error("artifact requires index.html");
+  }
+
+  const sortedFiles = [...files].sort();
+  if (JSON.stringify(files) !== JSON.stringify(sortedFiles)) {
+    throw new Error("artifact files must be sorted");
+  }
+}
+
 export async function collectPublicFiles(cwd, commit) {
   const root = resolve(cwd);
   const trackedFiles = (await runGit(root, ["ls-tree", "-r", "--name-only", commit]))
@@ -80,10 +117,12 @@ export async function verifyArtifact(manifest) {
     throw new Error("artifact checksum mismatch");
   }
 
+  validateArtifactFiles(manifest.files);
+
   const { stdout } = await execFile("unzip", ["-Z1", zipPath]);
   const entries = stdout.trim() === "" ? [] : stdout.trim().split("\n").filter((entry) => !entry.endsWith("/"));
-  const expectedFiles = [...manifest.files].sort();
-  if (JSON.stringify(entries) !== JSON.stringify(expectedFiles)) {
+  validateArtifactFiles(entries);
+  if (JSON.stringify(entries) !== JSON.stringify(manifest.files)) {
     throw new Error("artifact ZIP entries do not match manifest files");
   }
 

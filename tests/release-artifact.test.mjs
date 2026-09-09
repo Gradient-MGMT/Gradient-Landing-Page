@@ -39,6 +39,15 @@ async function sha256File(path) {
   return createHash("sha256").update(await readFile(path)).digest("hex");
 }
 
+async function replaceReleaseZipWithTrackedFiles(release, cwd, files) {
+  await run(
+    "git",
+    ["archive", "--format=zip", `--output=${release.zipPath}`, "HEAD", "--", ...files],
+    cwd,
+  );
+  release.manifest.sha256 = await sha256File(release.zipPath);
+}
+
 test("release artifact contains only the configured public surface", async (t) => {
   const fixture = await makeGitFixture(t, {
     "index.html": "home",
@@ -97,7 +106,7 @@ test("packaging refuses a dirty worktree", async (t) => {
   );
 });
 
-test("artifact verification rejects a ZIP whose contents no longer match the manifest", async (t) => {
+test("artifact verification rejects a checksum mismatch", async (t) => {
   const fixture = await makeGitFixture(t, { "index.html": "home", "styles.css": "body{}" });
   const release = await createReleaseArtifact({
     cwd: fixture,
@@ -107,4 +116,61 @@ test("artifact verification rejects a ZIP whose contents no longer match the man
   await writeFile(release.zipPath, "not a zip");
 
   await assert.rejects(verifyArtifact(release.manifest), /checksum mismatch/);
+});
+
+test("artifact verification rejects a matching-checksum forbidden ZIP entry", async (t) => {
+  const fixture = await makeGitFixture(t, {
+    "index.html": "home",
+    "docs/internal.md": "internal",
+  });
+  const release = await createReleaseArtifact({
+    cwd: fixture,
+    outputRoot: join(fixture, ".release"),
+    runTests: async () => {},
+  });
+  await replaceReleaseZipWithTrackedFiles(release, fixture, ["docs/internal.md"]);
+  release.manifest.files = ["docs/internal.md"];
+
+  await assert.rejects(verifyArtifact(release.manifest), /non-public path/);
+});
+
+test("artifact verification rejects a matching-checksum ZIP without index.html", async (t) => {
+  const fixture = await makeGitFixture(t, { "index.html": "home", "styles.css": "body{}" });
+  const release = await createReleaseArtifact({
+    cwd: fixture,
+    outputRoot: join(fixture, ".release"),
+    runTests: async () => {},
+  });
+  await replaceReleaseZipWithTrackedFiles(release, fixture, ["styles.css"]);
+  release.manifest.files = ["styles.css"];
+
+  await assert.rejects(verifyArtifact(release.manifest), /requires index.html/);
+});
+
+test("artifact verification rejects a matching-checksum ZIP entry-list mismatch", async (t) => {
+  const fixture = await makeGitFixture(t, { "index.html": "home", "styles.css": "body{}" });
+  const release = await createReleaseArtifact({
+    cwd: fixture,
+    outputRoot: join(fixture, ".release"),
+    runTests: async () => {},
+  });
+  await replaceReleaseZipWithTrackedFiles(release, fixture, ["index.html"]);
+  release.manifest.files = ["index.html", "styles.css"];
+
+  await assert.rejects(verifyArtifact(release.manifest), /ZIP entries do not match manifest files/);
+});
+
+test("artifact verification rejects unsafe and duplicate manifest paths", async (t) => {
+  const fixture = await makeGitFixture(t, { "index.html": "home" });
+  const release = await createReleaseArtifact({
+    cwd: fixture,
+    outputRoot: join(fixture, ".release"),
+    runTests: async () => {},
+  });
+
+  release.manifest.files = ["assets/../index.html"];
+  await assert.rejects(verifyArtifact(release.manifest), /unsafe path/);
+
+  release.manifest.files = ["index.html", "index.html"];
+  await assert.rejects(verifyArtifact(release.manifest), /duplicate path/);
 });
