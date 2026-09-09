@@ -14,6 +14,21 @@ import {
 } from "../scripts/release/workflow.mjs";
 
 const execFile = promisify(execFileCallback);
+const STAGING_ENDPOINTS = [
+  "https://staging.dmm14gzm5vsts.amplifyapp.com/",
+  "https://staging.dmm14gzm5vsts.amplifyapp.com/about",
+  "https://staging.dmm14gzm5vsts.amplifyapp.com/contact",
+  "https://staging.dmm14gzm5vsts.amplifyapp.com/robots.txt",
+  "https://staging.dmm14gzm5vsts.amplifyapp.com/sitemap.xml",
+];
+const PRODUCTION_ENDPOINTS = [
+  "https://gradientmgmt.com/",
+  "https://gradientmgmt.com/about",
+  "https://gradientmgmt.com/contact",
+  "https://gradientmgmt.com/robots.txt",
+  "https://gradientmgmt.com/sitemap.xml",
+  "https://www.gradientmgmt.com/",
+];
 
 async function releaseFixture(t) {
   const root = await mkdtemp(join(tmpdir(), "release-workflow-"));
@@ -86,10 +101,13 @@ function recordingAdapter(options = {}) {
       const statuses = statusQueues.get(branch);
       return statuses.length > 1 ? statuses.shift() : statuses[0];
     },
-    async checkUrl(url, options) {
+    async checkUrl(url, checkOptions) {
       calls.push(["checkUrl", url]);
       this.checkedUrls.push(url);
-      this.checkedUrlRequests.push({ url, options });
+      this.checkedUrlRequests.push({ url, options: checkOptions });
+      if (url === options.unreachableUrl) {
+        throw new Error(`endpoint unavailable: ${url}`);
+      }
     },
   };
 }
@@ -137,7 +155,7 @@ test("staging deployment can target only staging and writes a successful receipt
   assert.equal(receipt.sha256, manifest.sha256);
   assert.equal(receipt.baselineProductionJobId, "production-42");
   assert.deepEqual(JSON.parse(await readFile(receiptPath, "utf8")), receipt);
-  assert.deepEqual(adapter.checkedUrls, ["https://staging.dmm14gzm5vsts.amplifyapp.com/"]);
+  assert.deepEqual(adapter.checkedUrls, STAGING_ENDPOINTS);
   assert.deepEqual(adapter.calls.slice(0, 2), [
     ["getActiveJobId", "main"],
     ["createDeployment", "staging"],
@@ -175,6 +193,20 @@ test("staging uploads verified bytes when the source ZIP is replaced after verif
   assert.equal(adapter.uploaded[0].sha256, manifest.sha256);
 });
 
+test("staging does not write a receipt when a required review endpoint is unavailable", async (t) => {
+  const { manifest, receiptPath } = await releaseFixture(t);
+  const adapter = recordingAdapter({
+    unreachableUrl: "https://staging.dmm14gzm5vsts.amplifyapp.com/contact",
+  });
+
+  await assert.rejects(
+    deployStaging({ manifest, adapter, receiptPath, pollIntervalMs: 0 }),
+    /endpoint unavailable: .*\/contact/,
+  );
+  await assert.rejects(access(receiptPath));
+  assert.deepEqual(adapter.checkedUrls, STAGING_ENDPOINTS.slice(0, 3));
+});
+
 test("failed and cancelled staging jobs are terminal failures", async (t) => {
   for (const status of ["FAILED", "CANCELLED"]) {
     await t.test(status, async (t) => {
@@ -207,13 +239,43 @@ test("staging polling stops with a clear timeout", async (t) => {
   );
 });
 
-test("deployment verification checks the artifact, recorded job, and staging URL", async (t) => {
+test("deployment verification checks the active job and every required staging endpoint", async (t) => {
   const { manifest } = await releaseFixture(t);
   const receipt = successfulStagingReceipt(manifest);
   const adapter = recordingAdapter({ stagingStatuses: ["SUCCEED"] });
 
   await assert.doesNotReject(verifyDeployment({ manifest, receipt, adapter }));
-  assert.deepEqual(adapter.checkedUrls, ["https://staging.dmm14gzm5vsts.amplifyapp.com/"]);
+  assert.deepEqual(adapter.checkedUrls, STAGING_ENDPOINTS);
+});
+
+test("deployment verification rejects an obsolete receipt", async (t) => {
+  const { manifest } = await releaseFixture(t);
+  const receipt = successfulStagingReceipt(manifest);
+  const adapter = recordingAdapter({
+    stagingActiveJobId: "staging-newer-job",
+    stagingStatuses: ["SUCCEED"],
+  });
+
+  await assert.rejects(
+    verifyDeployment({ manifest, receipt, adapter }),
+    /deployment receipt is not the active branch deployment/,
+  );
+  assert.deepEqual(adapter.checkedUrls, []);
+});
+
+test("deployment verification rejects a missing required endpoint", async (t) => {
+  const { manifest } = await releaseFixture(t);
+  const receipt = successfulStagingReceipt(manifest);
+  const adapter = recordingAdapter({
+    stagingStatuses: ["SUCCEED"],
+    unreachableUrl: "https://staging.dmm14gzm5vsts.amplifyapp.com/sitemap.xml",
+  });
+
+  await assert.rejects(
+    verifyDeployment({ manifest, receipt, adapter }),
+    /endpoint unavailable: .*\/sitemap\.xml/,
+  );
+  assert.deepEqual(adapter.checkedUrls, STAGING_ENDPOINTS);
 });
 
 test("production promotion requires the exact digest", async (t) => {
@@ -322,12 +384,13 @@ test("production promotion uploads the staged bytes only after every gate", asyn
   assert.deepEqual(adapter.createdBranches, ["main"]);
   assert.equal(adapter.uploaded[0].url, "https://upload.example.test/main");
   assert.equal(adapter.uploaded[0].sha256, manifest.sha256);
-  assert.deepEqual(adapter.checkedUrls, [
-    "https://gradientmgmt.com/",
-    "https://www.gradientmgmt.com/",
-  ]);
+  assert.deepEqual(adapter.checkedUrls, PRODUCTION_ENDPOINTS);
   assert.deepEqual(adapter.checkedUrlRequests, [
     { url: "https://gradientmgmt.com/", options: undefined },
+    { url: "https://gradientmgmt.com/about", options: undefined },
+    { url: "https://gradientmgmt.com/contact", options: undefined },
+    { url: "https://gradientmgmt.com/robots.txt", options: undefined },
+    { url: "https://gradientmgmt.com/sitemap.xml", options: undefined },
     {
       url: "https://www.gradientmgmt.com/",
       options: { expectedRedirectUrl: "https://gradientmgmt.com/" },

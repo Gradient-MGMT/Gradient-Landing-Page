@@ -15,6 +15,7 @@ import { verifyArtifact } from "./artifact.mjs";
 import { RELEASE } from "./config.mjs";
 
 const TERMINAL_FAILURES = new Set(["FAILED", "CANCELLED"]);
+const REQUIRED_PUBLIC_PATHS = ["", "about", "contact", "robots.txt", "sitemap.xml"];
 
 function delay(milliseconds) {
   if (milliseconds === 0) return Promise.resolve();
@@ -73,11 +74,17 @@ function assertReceiptMatchesManifest(manifest, receipt) {
 }
 
 function urlChecksForBranch(branch) {
-  if (branch === RELEASE.stagingBranch) return [{ url: RELEASE.stagingUrl }];
+  if (branch === RELEASE.stagingBranch) {
+    return REQUIRED_PUBLIC_PATHS.map((path) => ({
+      url: new URL(path, RELEASE.stagingUrl).href,
+    }));
+  }
   if (branch === RELEASE.productionBranch) {
     const [apexUrl, wwwUrl] = RELEASE.productionUrls;
     return [
-      { url: apexUrl },
+      ...REQUIRED_PUBLIC_PATHS.map((path) => ({
+        url: new URL(path, apexUrl).href,
+      })),
       { url: wwwUrl, options: { expectedRedirectUrl: apexUrl } },
     ];
   }
@@ -150,6 +157,9 @@ export async function verifyDeployment({ manifest, receipt, adapter }) {
   }
   if (receipt.status !== "SUCCEED") {
     throw new Error("deployment receipt is not successful");
+  }
+  if (await adapter.getActiveJobId(receipt.branch) !== receipt.jobId) {
+    throw new Error("deployment receipt is not the active branch deployment");
   }
   const status = await adapter.getJobStatus(receipt.branch, receipt.jobId);
   if (status !== "SUCCEED") {

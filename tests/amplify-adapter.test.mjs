@@ -28,6 +28,9 @@ function responseFor({ statusCode = 200, headers = {}, event = "end" }) {
     queueMicrotask(() => response.emit("aborted"));
   } else if (event === "error") {
     queueMicrotask(() => response.emit("error", new Error("response stream failed")));
+  } else if (event === "stream") {
+    const interval = setInterval(() => response.write("still active"), 2);
+    response.once("close", () => clearInterval(interval));
   }
   return response;
 }
@@ -45,12 +48,16 @@ function recordingHttps(scenarios) {
         if (scenario.type === "timeout") queueMicrotask(callback);
         return outgoing;
       };
-      requests.push({ url: String(url), options, timeout: undefined });
+      const record = { url: String(url), options, timeout: undefined, outgoing };
+      requests.push(record);
 
       if (scenario.type === "request-error") {
         queueMicrotask(() => outgoing.emit("error", new Error("request socket failed")));
       } else if (scenario.type !== "timeout") {
-        queueMicrotask(() => onResponse(responseFor(scenario)));
+        queueMicrotask(() => {
+          record.response = responseFor(scenario);
+          onResponse(record.response);
+        });
       }
       return outgoing;
     },
@@ -110,6 +117,21 @@ test("HTTP requests reject on their configured deadline", async () => {
     /GET request timed out after 25ms/,
   );
   assert.equal(transport.requests[0].timeout, 25);
+});
+
+test("elapsed deadline rejects a response that keeps streaming data", async (t) => {
+  const transport = recordingHttps([{ statusCode: 200, event: "stream" }]);
+  t.after(() => transport.requests[0]?.response?.destroy());
+  const adapter = createAmplifyAdapter({
+    httpsRequest: transport.request,
+    requestTimeoutMs: 10,
+  });
+
+  await assert.rejects(
+    withWatchdog(adapter.checkUrl("mock://streaming.example.test/")),
+    /GET request timed out after 10ms/,
+  );
+  assert.equal(transport.requests[0].outgoing.destroyed, true);
 });
 
 test("HTTP requests reject when the response is aborted", async () => {

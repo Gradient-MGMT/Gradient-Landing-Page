@@ -22,12 +22,16 @@ function request({
   return new Promise((resolve, reject) => {
     let input;
     let outgoing;
+    let response;
     let settled = false;
+    let deadline;
 
     const fail = (error) => {
       if (settled) return;
       settled = true;
+      clearTimeout(deadline);
       input?.destroy();
+      response?.destroy();
       if (outgoing && !outgoing.destroyed) outgoing.destroy();
       reject(error);
     };
@@ -35,11 +39,18 @@ function request({
     const succeed = (value) => {
       if (settled) return;
       settled = true;
+      clearTimeout(deadline);
       resolve(value);
     };
 
+    const timeout = () => {
+      fail(new Error(`${method} request timed out after ${timeoutMs}ms`));
+    };
+    deadline = setTimeout(timeout, timeoutMs);
+
     try {
-      outgoing = httpsRequest(url, { method, headers }, (response) => {
+      outgoing = httpsRequest(url, { method, headers }, (incoming) => {
+        response = incoming;
         response.once("aborted", () => fail(new Error(`${method} response aborted`)));
         response.once("error", fail);
         response.once("end", () => {
@@ -58,9 +69,7 @@ function request({
     }
 
     outgoing.once("error", fail);
-    outgoing.setTimeout(timeoutMs, () => {
-      fail(new Error(`${method} request timed out after ${timeoutMs}ms`));
-    });
+    outgoing.setTimeout(timeoutMs, timeout);
 
     if (bodyPath === undefined) {
       outgoing.end();
