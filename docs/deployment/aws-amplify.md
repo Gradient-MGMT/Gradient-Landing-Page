@@ -119,7 +119,7 @@ Confirm all of the following:
 - Public NS results converge on all four Route 53 nameservers.
 - The root and `www` URLs serve the intended site with a valid certificate and canonical redirect.
 - Amplify reports the domain as available/active.
-- Home, About, Contact, Investor Login, and the mock portal still load.
+- Home, About, Contact, and Investor Login load; `/portal.html` redirects to login, and every sign-in attempt is rejected.
 - Inbound and outbound email work with an external mailbox.
 - MX, SPF, DKIM, and DMARC checks pass.
 - Every other service recorded in GRA-415 still works.
